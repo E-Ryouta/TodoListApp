@@ -1,22 +1,19 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { DraggableContext } from "./DraggableContext";
 import { CSS } from "@dnd-kit/utilities";
-
-type DraggableDataProps = {
-  taskTitle: string;
-  taskDescription: string;
-};
+import { UUID } from "crypto";
 
 type DraggableContainerProps = {
-  id: string;
+  id: UUID;
   children: React.ReactNode;
 };
 
 export function DraggableContainer({ ...props }: DraggableContainerProps) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
+  const { active, attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id });
 
   const style = {
+    opacity: props.id === active?.id ? 0.5 : 1,
     transform: CSS.Translate.toString(transform),
     transition,
   };

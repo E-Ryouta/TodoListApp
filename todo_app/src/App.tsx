@@ -1,6 +1,6 @@
 import "./App.css";
 import theme from "./theme";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
 import { DroppableTaskContainer } from "./components/DroppableTaskContainer";
 import {
   ChakraProvider,
@@ -15,6 +15,9 @@ import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import { useState } from "react";
 import { DraggableTaskCardProps } from "./components/DraggableTaskCard";
 import { TaskCard } from "./components/DraggableTaskCard";
+import { arrayMove } from "@dnd-kit/sortable";
+import { v4 as uuidv4 } from "uuid";
+import { UUID } from "crypto";
 
 export type TaskContanarListProps = {
   progressHeader: string;
@@ -22,7 +25,7 @@ export type TaskContanarListProps = {
 };
 
 export type TaskContainerListContextType = {
-  [key: string]: TaskContanarListProps;
+  [key: UUID]: TaskContanarListProps;
 };
 
 function App() {
@@ -37,15 +40,15 @@ function App() {
 
   const [taskContainerList, setTaskContainerList] =
     useState<TaskContainerListContextType>({
-      "To Do": {
+      [uuidv4()]: {
         progressHeader: "To Do",
         tasks: [],
       },
-      "In Progress": {
+      [uuidv4()]: {
         progressHeader: "In Progress",
         tasks: [],
       },
-      Done: {
+      [uuidv4()]: {
         progressHeader: "Done",
         tasks: [],
       },
@@ -70,9 +73,81 @@ function App() {
     });
   };
 
+  const handleDragOver = (event: any) => {
+    const { active, over } = event;
+
+    console.log(over);
+
+    const activeContainerId = active?.data?.current?.sortable.containerId;
+    const overContainerId = taskContainerList[over.id]
+      ? over.id
+      : over?.data?.current?.sortable.containerId;
+
+    if (!overContainerId) {
+      return;
+    }
+
+    if (activeContainerId === overContainerId) {
+      return;
+    }
+
+    const newTasks = taskContainerList[activeContainerId].tasks.filter(
+      (task) => task.id !== active.id
+    );
+
+    const insertTask = taskContainerList[activeContainerId].tasks.find(
+      (task) => task.id === active.id
+    );
+
+    setTaskContainerList((prev) => {
+      return {
+        ...prev,
+        [activeContainerId]: {
+          tasks: newTasks,
+        },
+        [overContainerId]: {
+          tasks: [...prev[overContainerId].tasks, insertTask],
+        },
+      };
+    });
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    const activeContainerId = active?.data?.current?.sortable.containerId;
+    const overContainerId = over?.data?.current?.sortable.containerId;
+
+    if (active.id === over?.id) {
+      return;
+    }
+
+    if (activeContainerId === overContainerId) {
+      const newTasks = arrayMove(
+        taskContainerList[activeContainerId].tasks,
+        active?.data.current?.sortable.index,
+        over?.data.current?.sortable.index
+      );
+
+      setTaskContainerList((prev) => {
+        return {
+          ...prev,
+          [activeContainerId]: {
+            progressHeader: prev[activeContainerId].progressHeader,
+            tasks: newTasks,
+          },
+        };
+      });
+    }
+  };
+
   return (
     <ChakraProvider theme={theme}>
-      <DndContext onDragStart={handleDragStart}>
+      <DndContext
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragOver={handleDragOver}
+      >
         <Box h={"100vh"}>
           <NavBar></NavBar>
           <HStack h={"calc(100vh - 50px)"}>
@@ -100,7 +175,7 @@ function App() {
                 ([key, taskContainers]) => (
                   <DroppableTaskContainer
                     key={key}
-                    id={key}
+                    id={key as UUID}
                     tasks={taskContainers.tasks}
                     progressHeader={taskContainers.progressHeader}
                     setTaskContainerList={setTaskContainerList}
@@ -111,11 +186,6 @@ function App() {
           </HStack>
           <DragOverlay>
             {active ? (
-              // <DraggableTaskCard
-              //   id={active.id}
-              //   taskTitle={active.data.taskTitle}
-              //   taskDescription={""}
-              // />
               <TaskCard
                 id={active.id}
                 taskTitle={active.data.taskTitle}

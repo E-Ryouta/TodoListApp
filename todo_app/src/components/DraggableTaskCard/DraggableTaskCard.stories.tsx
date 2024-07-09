@@ -1,5 +1,7 @@
 import { DraggableTaskCard } from "./DraggableTaskCard";
 import { Meta, StoryObj } from "@storybook/react";
+import { UUID } from "crypto";
+import { v4 as uuidv4 } from "uuid";
 
 const uiDraggableTaskCardCardMeta: Meta<typeof DraggableTaskCard> = {
   title: "DraggableTaskCard",
@@ -11,7 +13,7 @@ type DraggableTaskCardStoryProps = StoryObj<typeof DraggableTaskCard>;
 
 export const DraggableTaskCardStory: DraggableTaskCardStoryProps = {
   args: {
-    id: "1",
+    id: uuidv4() as UUID,
     taskTitle: "Task Title",
     taskDescription: "Task Description",
   },

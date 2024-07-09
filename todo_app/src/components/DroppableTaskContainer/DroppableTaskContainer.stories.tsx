@@ -1,5 +1,7 @@
 import { DroppableTaskContainer } from "./DroppableTaskContainer";
 import { Meta, StoryObj } from "@storybook/react";
+import { v4 as uuid4 } from "uuid";
+import { UUID } from "crypto";
 
 const uiDroppableTaskContainerdMeta: Meta<typeof DroppableTaskContainer> = {
   title: "DroppableTaskContainer",
@@ -11,7 +13,9 @@ type DroppableTaskContainerStoryProps = StoryObj<typeof DroppableTaskContainer>;
 
 export const DroppableTaskContainerStory: DroppableTaskContainerStoryProps = {
   args: {
-    progressHeader: "To Do",
+    id: uuid4() as UUID,
+    progressHeader: "In Progress",
     tasks: [],
+    setTaskContainerList: () => {},
   },
 };

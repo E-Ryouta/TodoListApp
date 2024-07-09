@@ -4,11 +4,14 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { DraggableTaskCardProps } from "../DraggableTaskCard";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { TaskContainerListContextType } from "../TaskProvider/TaskContext";
+import { useDroppable } from "@dnd-kit/core";
+import { Box } from "@chakra-ui/react";
+import { UUID } from "crypto";
 
 export type DroppableTaskContainerProps = {
-  id: string;
+  id: UUID;
   progressHeader: string;
   tasks: DraggableTaskCardProps[];
   setTaskContainerList: Dispatch<SetStateAction<TaskContainerListContextType>>;
@@ -17,19 +20,25 @@ export type DroppableTaskContainerProps = {
 export function DroppableTaskContainer({
   ...props
 }: DroppableTaskContainerProps) {
+  const { setNodeRef } = useDroppable({
+    id: props.id,
+  });
+
   return (
     <SortableContext
       id={props.id}
       items={props.tasks}
       strategy={verticalListSortingStrategy}
     >
-      <TaskProgressCard
-        id={props.id}
-        progressHeader={props.progressHeader}
-        tasks={props.tasks}
-        setTaskContainerList={props.setTaskContainerList}
-        containerId={props.id}
-      />
+      <Box ref={setNodeRef} h={"100%"}>
+        <TaskProgressCard
+          id={props.id}
+          progressHeader={props.progressHeader}
+          tasks={props.tasks}
+          setTaskContainerList={props.setTaskContainerList}
+          containerId={props.id}
+        />
+      </Box>
     </SortableContext>
   );
 }

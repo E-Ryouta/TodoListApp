@@ -10,8 +10,12 @@ import {
   Flex,
   Box,
 } from "@chakra-ui/react";
-import { MdOutlineDescription, MdDragIndicator } from "react-icons/md";
-import { useState, useContext, Dispatch, SetStateAction } from "react";
+import {
+  MdOutlineDescription,
+  MdDragIndicator,
+  MdDeleteOutline,
+} from "react-icons/md";
+import { useContext, useRef, Dispatch, SetStateAction, useEffect } from "react";
 import { DraggableContext } from "../../DraggableContainer/DraggableContext";
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
 
@@ -25,9 +29,45 @@ type TaskCardProps = {
 
 export function TaskCard({ ...props }: TaskCardProps) {
   const [addDescriptionFlag, setAddDescriptionFlag] = useBoolean(false);
-  const [task, setTaskTitle] = useState(props.taskTitle);
-  const [taskDescription, setTaskDescription] = useState(props.taskDescription);
   const draggableContext = useContext(DraggableContext);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const updateTask = (
+    field: "taskTitle" | "taskDescription",
+    value: string
+  ) => {
+    props.setTaskContainerList?.((prev) => {
+      return {
+        ...prev,
+        [props.containerId]: {
+          progressHeader: prev[props.containerId].progressHeader,
+          tasks: prev[props.containerId].tasks.map((task) => {
+            if (task.id === props.id) {
+              return {
+                ...task,
+                [field]: value,
+              };
+            }
+            return task;
+          }),
+        },
+      };
+    });
+  };
+
+  const deleteTask = (taskId: string) => {
+    props.setTaskContainerList?.((prev) => {
+      return {
+        ...prev,
+        [props.containerId]: {
+          progressHeader: prev[props.containerId].progressHeader,
+          tasks: prev[props.containerId].tasks.filter(
+            (task) => task.id !== taskId
+          ),
+        },
+      };
+    });
+  };
 
   return (
     <Card variant={"elevated"} size={"sm"}>
@@ -42,27 +82,14 @@ export function TaskCard({ ...props }: TaskCardProps) {
           />
           <Input
             variant={"unstyled"}
-            value={task}
+            value={props.taskTitle}
             ml={4}
-            onChange={(e) => {
-              setTaskTitle(e.target.value);
-              props.setTaskContainerList?.((prev) => {
-                return {
-                  ...prev,
-                  [props.containerId]: {
-                    progressHeader: prev[props.containerId].progressHeader,
-                    tasks: prev[props.containerId].tasks.map((task) => {
-                      if (task.id === props.id) {
-                        return {
-                          ...task,
-                          taskTitle: e.target.value,
-                        };
-                      }
-                      return task;
-                    }),
-                  },
-                };
-              });
+            ref={inputRef}
+            onChange={(e) => updateTask("taskTitle", e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                inputRef.current?.blur();
+              }
             }}
           />
           <IconButton
@@ -70,6 +97,12 @@ export function TaskCard({ ...props }: TaskCardProps) {
             aria-label="add description"
             icon={<MdOutlineDescription />}
             onClick={setAddDescriptionFlag.toggle}
+          />
+          <IconButton
+            variant={"ghost"}
+            aria-label="delete"
+            icon={<MdDeleteOutline />}
+            onClick={() => deleteTask(props.id)}
           />
         </Flex>
       </CardHeader>
@@ -80,10 +113,8 @@ export function TaskCard({ ...props }: TaskCardProps) {
             <Textarea
               variant={"unstyled"}
               placeholder={"Task Description"}
-              value={taskDescription}
-              onChange={(e) => {
-                setTaskDescription(e.target.value);
-              }}
+              value={props.taskDescription}
+              onChange={(e) => updateTask("taskDescription", e.target.value)}
             />
           </CardBody>
         </Box>

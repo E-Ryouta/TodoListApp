@@ -3,9 +3,10 @@ import { DraggableContainer } from "../DraggableContainer";
 import { Box } from "@chakra-ui/react";
 import { Dispatch, SetStateAction } from "react";
 import { TaskContainerListContextType } from "../TaskProvider/TaskContext";
+import { UUID } from "crypto";
 
 export type DraggableTaskCardProps = {
-  id: string;
+  id: UUID;
   taskTitle: string;
   taskDescription: string;
   containerId: string;

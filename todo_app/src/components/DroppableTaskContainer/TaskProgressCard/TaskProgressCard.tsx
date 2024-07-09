@@ -14,9 +14,11 @@ import {
   DraggableTaskCardProps,
 } from "../../DraggableTaskCard";
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
+import { v4 as uuidv4 } from "uuid";
+import { UUID } from "crypto";
 
 type TaskProgressCardProps = {
-  id: string;
+  id: UUID;
   progressHeader: string;
   tasks: DraggableTaskCardProps[];
   containerId: string;
@@ -39,7 +41,7 @@ export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
     const newTasks = [
       ...props.tasks,
       {
-        id: `${progressHeader}-${props.tasks.length + 1}`,
+        id: uuidv4() as UUID,
         taskTitle: "",
         taskDescription: "",
         containerId: props.id,
