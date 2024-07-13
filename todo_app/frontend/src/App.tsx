@@ -44,12 +44,6 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchGet("/api/todo_list", {});
-      console.log(Object.keys(data));
-      console.log(taskContainerList);
-      Object.keys(data).forEach((key) => {
-        console.log(key);
-        console.log(data[key].taskContainer.progress_header);
-      });
       setTaskContainerList(
         Object.keys(data).reduce((acc: any, key: any) => {
           return {
@@ -58,7 +52,7 @@ function App() {
               progressHeader: data[key].taskContainer.progress_header,
               tasks: Object.values(data[key].tasks).map((task: any) => {
                 return {
-                  id: task.tasks_id,
+                  id: task.task_id,
                   taskTitle: task.task_title,
                   taskDescription: task.task_description,
                 };
