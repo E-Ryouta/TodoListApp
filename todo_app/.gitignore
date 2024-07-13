@@ -11,6 +11,9 @@ frontend/coverage
 # production
 frontend/build
 
+# backend
+backend/**/__pycache__/**
+
 # misc
 .DS_Store
 .env.local
