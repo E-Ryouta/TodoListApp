@@ -1,7 +1,7 @@
 import "./App.css";
 import theme from "./theme";
 import { DndContext, DragEndEvent, DragOverlay } from "@dnd-kit/core";
-import { DroppableTaskContainer } from "./components/DroppableTaskContainer";
+import { DroppableTaskContainer } from "./common/components/DroppableTaskContainer";
 import {
   ChakraProvider,
   HStack,
@@ -9,15 +9,15 @@ import {
   IconButton,
   useBoolean,
 } from "@chakra-ui/react";
-import { SideBar } from "./components/SideBar/SideBar";
-import { NavBar } from "./components/NavBar/NavBar";
+import { SideBar } from "./common/components/SideBar/SideBar";
+import { NavBar } from "./common/components/NavBar/NavBar";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
-import { useState } from "react";
-import { DraggableTaskCardProps } from "./components/DraggableTaskCard";
-import { TaskCard } from "./components/DraggableTaskCard";
+import { useEffect, useState } from "react";
+import { DraggableTaskCardProps } from "./common/components/DraggableTaskCard";
+import { TaskCard } from "./common/components/DraggableTaskCard";
 import { arrayMove } from "@dnd-kit/sortable";
-import { v4 as uuidv4 } from "uuid";
 import { UUID } from "crypto";
+import { fetchGet } from "./common/lib/fetch";
 
 export type TaskContanarListProps = {
   progressHeader: string;
@@ -39,20 +39,38 @@ function App() {
   });
 
   const [taskContainerList, setTaskContainerList] =
-    useState<TaskContainerListContextType>({
-      [uuidv4()]: {
-        progressHeader: "To Do",
-        tasks: [],
-      },
-      [uuidv4()]: {
-        progressHeader: "In Progress",
-        tasks: [],
-      },
-      [uuidv4()]: {
-        progressHeader: "Done",
-        tasks: [],
-      },
-    });
+    useState<TaskContainerListContextType>({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await fetchGet("/api/todo_list", {});
+      console.log(Object.keys(data));
+      console.log(taskContainerList);
+      Object.keys(data).forEach((key) => {
+        console.log(key);
+        console.log(data[key].taskContainer.progress_header);
+      });
+      setTaskContainerList(
+        Object.keys(data).reduce((acc: any, key: any) => {
+          return {
+            ...acc,
+            [key]: {
+              progressHeader: data[key].taskContainer.progress_header,
+              tasks: Object.values(data[key].tasks).map((task: any) => {
+                return {
+                  id: task.tasks_id,
+                  taskTitle: task.task_title,
+                  taskDescription: task.task_description,
+                };
+              }),
+            },
+          };
+        }, {})
+      );
+    };
+
+    fetchData();
+  }, []);
 
   const handleDragStart = (event: any) => {
     const { id } = event.active;
@@ -75,8 +93,6 @@ function App() {
 
   const handleDragOver = (event: any) => {
     const { active, over } = event;
-
-    console.log(over);
 
     const activeContainerId = active?.data?.current?.sortable.containerId;
     const overContainerId = taskContainerList[over.id]

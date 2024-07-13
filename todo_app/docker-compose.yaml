@@ -4,7 +4,7 @@ services:
   db:
     image: postgres:15.2
     volumes:
-      - db:/var/lib/postgresql/ToDoAppData
+      - db:/var/lib/postgresql/data
       - ./database/Sql:/docker-entrypoint-initdb.d
     environment:
       POSTGRES_USER: postgres
@@ -35,6 +35,8 @@ services:
       - 80:80
     networks:
       - todo_app_network
+    environment:
+      - BACKEND_ORIGIN_CLIENT=${BACKEND_ORIGIN_CLIENT}
 
   todo_api:
     build:

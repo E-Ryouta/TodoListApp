@@ -2,6 +2,10 @@ FROM node:20.0.0 AS base
 WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
+
+ARG BACKEND_ORIGIN_CLIENT
+ENV REACT_APP_BACKEND_ORIGIN_CLIENT=${BACKEND_ORIGIN_CLIENT}
+
 RUN yarn install --frozen-lockfile
 
 FROM base AS build

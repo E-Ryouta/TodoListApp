@@ -18,6 +18,10 @@ server {
 
     client_max_body_size 100m;
 
+    location /api/ {
+        proxy_pass http://todo_api:5001;
+    }
+
     location / {
         proxy_pass http://frontend;
     }
