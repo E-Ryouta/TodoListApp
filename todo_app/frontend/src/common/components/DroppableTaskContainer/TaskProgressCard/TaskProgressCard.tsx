@@ -26,17 +26,6 @@ type TaskProgressCardProps = {
 };
 
 export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
-  const [isEditing, setIsEditing] = useBoolean();
-  const [progressHeader, setProgressHeader] = useState(props.progressHeader);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleOnEditClicked = () => {
-    setIsEditing.on();
-    setTimeout(() => {
-      inputRef.current?.focus();
-    }, 0);
-  };
-
   const handleAddTask = () => {
     const newTasks = [
       ...props.tasks,
@@ -51,9 +40,9 @@ export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
       return {
         ...prev,
         [props.id]: {
-          progressHeader: progressHeader,
-          tasks: newTasks,
           containerId: props.id,
+          progressHeader: props.progressHeader,
+          tasks: newTasks,
         },
       };
     });
@@ -61,41 +50,9 @@ export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
 
   return (
     <Card w={"500px"} borderRadius={30}>
-      <Button
-        variant={"ghost"}
-        onClick={handleOnEditClicked}
-        w={"100%"}
-        borderTopRadius={30}
-      >
-        {isEditing ? (
-          <Input
-            ref={inputRef}
-            value={progressHeader}
-            textAlign={"center"}
-            borderRadius={30}
-            sx={{
-              fontWeight: "bold",
-              fontSize: "lg",
-            }}
-            onChange={(e) => setProgressHeader(e.target.value)}
-            onBlur={setIsEditing.off}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                setIsEditing.off();
-              }
-            }}
-          />
-        ) : (
-          <Text
-            sx={{
-              fontWeight: "bold",
-              fontSize: "lg",
-            }}
-          >
-            {progressHeader}
-          </Text>
-        )}
-      </Button>
+      <Text textAlign={"center"} fontWeight={"bold"} fontSize={"xl"}>
+        {props.progressHeader}
+      </Text>
       <Divider />
       <Box px={4}>
         {props.tasks.map((task) => (

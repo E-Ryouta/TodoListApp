@@ -113,9 +113,11 @@ function App() {
       return {
         ...prev,
         [activeContainerId]: {
+          progressHeader: prev[activeContainerId].progressHeader,
           tasks: newTasks,
         },
         [overContainerId]: {
+          progressHeader: prev[overContainerId].progressHeader,
           tasks: [...prev[overContainerId].tasks, insertTask],
         },
       };
