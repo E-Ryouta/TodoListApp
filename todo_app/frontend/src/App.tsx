@@ -44,6 +44,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await fetchGet("/api/todo_list", {});
+      console.log(data);
       setTaskContainerList(
         Object.keys(data).reduce((acc: any, key: any) => {
           return {
