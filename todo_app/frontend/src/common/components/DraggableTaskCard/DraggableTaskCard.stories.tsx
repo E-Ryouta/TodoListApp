@@ -16,5 +16,6 @@ export const DraggableTaskCardStory: DraggableTaskCardStoryProps = {
     id: uuidv4() as UUID,
     taskTitle: "Task Title",
     taskDescription: "Task Description",
+    containerId: uuidv4() as UUID,
   },
 };

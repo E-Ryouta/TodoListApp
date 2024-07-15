@@ -8,6 +8,7 @@ import {
   Box,
   IconButton,
   useBoolean,
+  VStack,
 } from "@chakra-ui/react";
 import { SideBar } from "./common/components/SideBar/SideBar";
 import { NavBar } from "./common/components/NavBar/NavBar";
@@ -18,6 +19,7 @@ import { TaskCard } from "./common/components/DraggableTaskCard";
 import { arrayMove } from "@dnd-kit/sortable";
 import { UUID } from "crypto";
 import { fetchGet, fetchPut } from "./common/lib/fetch";
+import { DateBar } from "./common/components/DateBar";
 
 export type TaskContanarListProps = {
   progressHeader: string;
@@ -38,6 +40,7 @@ function App() {
     },
   });
 
+  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
   const [isChange, setIsChange] = useBoolean(false);
   const [taskContainerList, setTaskContainerList] =
     useState<TaskContainerListContextType>({});
@@ -179,7 +182,18 @@ function App() {
         onDragOver={handleDragOver}
       >
         <Box h={"100vh"}>
-          <NavBar></NavBar>
+          <NavBar />
+          <Box
+            position="fixed"
+            top="50px"
+            bg={"gray.100"}
+            pl={isOpen ? "200px" : "50px"}
+            display="flex"
+            justifyContent="center"
+            w={"100%"}
+          >
+            <DateBar date={date} setDate={setDate} />
+          </Box>
           <HStack h={"calc(100vh - 50px)"}>
             <HStack h={"100%"}>
               {isOpen && <SideBar></SideBar>}
@@ -196,7 +210,7 @@ function App() {
             </HStack>
             <HStack
               h={"100%"}
-              pt={"1rem"}
+              pt={"70px"}
               spacing={"2rem"}
               align={"flex-start"}
               overflowX={"auto"}
