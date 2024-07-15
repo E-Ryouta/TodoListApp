@@ -19,13 +19,32 @@ export const fetchGet = async (
   return response.json();
 };
 
-// URLを取得する関数を作る
+// PUTリクエストを送る関数
+export const fetchPut = async (
+  endpoint: string,
+  body: { [key: string]: string }
+) => {
+  const url = getUrl(endpoint);
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  return response.json();
+};
+
+// URLを作成する関数を作る
 const getUrl = (endpoint: string) => {
   const baseUrl = process.env.BACKEND_ORIGIN_CLIENT || "http://localhost:3000";
   return `${baseUrl}${endpoint}`;
 };
 
-// クエリパラメータを取得する関数を作る
+// クエリパラメータを作成する関数を作る
 const objectToQuery = (obj: { [key: string]: string }) => {
   const query = Object.keys(obj)
     .map((key) => `${key}=${encodeURIComponent(obj[key])}`)

@@ -17,7 +17,7 @@ import { DraggableTaskCardProps } from "./common/components/DraggableTaskCard";
 import { TaskCard } from "./common/components/DraggableTaskCard";
 import { arrayMove } from "@dnd-kit/sortable";
 import { UUID } from "crypto";
-import { fetchGet } from "./common/lib/fetch";
+import { fetchGet, fetchPut } from "./common/lib/fetch";
 
 export type TaskContanarListProps = {
   progressHeader: string;
@@ -30,7 +30,7 @@ export type TaskContainerListContextType = {
 
 function App() {
   const [isOpen, setIsOpen] = useBoolean();
-  const [active, setActive] = useState({
+  const [activeTask, setActiveTask] = useState({
     id: "",
     data: {
       taskTitle: "",
@@ -38,18 +38,20 @@ function App() {
     },
   });
 
+  const [isChange, setIsChange] = useBoolean(false);
   const [taskContainerList, setTaskContainerList] =
     useState<TaskContainerListContextType>({});
 
+  // 画面がロードした時にAPIからデータを取得して、taskContainerListにセットする
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchGet("/api/todo_list", {});
+      const data = await fetchGet("/api/todo_lists", {});
       console.log(data);
       setTaskContainerList(
         Object.keys(data).reduce((acc: any, key: any) => {
           return {
             ...acc,
-            [key]: {
+            [data[key].taskContainer.task_container_id]: {
               progressHeader: data[key].taskContainer.progress_header,
               tasks: Object.values(data[key].tasks).map((task: any) => {
                 return {
@@ -67,8 +69,13 @@ function App() {
     fetchData();
   }, []);
 
+  const fetchTask = async (data: {}) => {
+    await fetchPut("/api/tasks", data);
+  };
+
   const handleDragStart = (event: any) => {
     const { id } = event.active;
+
     const containerId = event.active.data.current.sortable.containerId;
     const activeTaskTitle =
       taskContainerList[containerId].tasks.find((task) => task.id === id)
@@ -77,7 +84,7 @@ function App() {
       taskContainerList[containerId].tasks.find((task) => task.id === id)
         ?.taskDescription ?? "";
 
-    setActive({
+    setActiveTask({
       id: id,
       data: {
         taskTitle: activeTaskTitle,
@@ -88,6 +95,9 @@ function App() {
 
   const handleDragOver = (event: any) => {
     const { active, over } = event;
+    if (!over) {
+      return;
+    }
 
     const activeContainerId = active?.data?.current?.sortable.containerId;
     const overContainerId = taskContainerList[over.id]
@@ -111,6 +121,7 @@ function App() {
     );
 
     setTaskContainerList((prev) => {
+      setIsChange.on();
       return {
         ...prev,
         [activeContainerId]: {
@@ -131,10 +142,6 @@ function App() {
     const activeContainerId = active?.data?.current?.sortable.containerId;
     const overContainerId = over?.data?.current?.sortable.containerId;
 
-    if (active.id === over?.id) {
-      return;
-    }
-
     if (activeContainerId === overContainerId) {
       const newTasks = arrayMove(
         taskContainerList[activeContainerId].tasks,
@@ -151,6 +158,16 @@ function App() {
           },
         };
       });
+    }
+
+    if (isChange) {
+      fetchTask({
+        task_id: active.id,
+        task_container_id: activeContainerId,
+        task_title: activeTask.data.taskTitle,
+        task_description: activeTask.data.taskDescription,
+      });
+      setIsChange.off();
     }
   };
 
@@ -198,11 +215,11 @@ function App() {
             </HStack>
           </HStack>
           <DragOverlay>
-            {active ? (
+            {activeTask ? (
               <TaskCard
-                id={active.id}
-                taskTitle={active.data.taskTitle}
-                taskDescription={active.data.taskDescription}
+                id={activeTask.id}
+                taskTitle={activeTask.data.taskTitle}
+                taskDescription={activeTask.data.taskDescription}
                 containerId={""}
               />
             ) : null}

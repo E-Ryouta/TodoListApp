@@ -1,13 +1,5 @@
-import {
-  Card,
-  Divider,
-  Input,
-  Box,
-  useBoolean,
-  Button,
-  Text,
-} from "@chakra-ui/react";
-import { useState, useRef, Dispatch, SetStateAction } from "react";
+import { Card, Divider, Box, Button, Text } from "@chakra-ui/react";
+import { Dispatch, SetStateAction } from "react";
 import { FaPlus } from "react-icons/fa6";
 import {
   DraggableTaskCard,
@@ -16,6 +8,7 @@ import {
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
 import { v4 as uuidv4 } from "uuid";
 import { UUID } from "crypto";
+import { fetchPut } from "../../../lib/fetch";
 
 type TaskProgressCardProps = {
   id: UUID;
@@ -26,6 +19,10 @@ type TaskProgressCardProps = {
 };
 
 export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
+  const fetchTask = async (data: {}) => {
+    await fetchPut("/api/tasks", data);
+  };
+
   const handleAddTask = () => {
     const newTasks = [
       ...props.tasks,
@@ -36,6 +33,12 @@ export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
         containerId: props.id,
       },
     ];
+    fetchTask({
+      task_id: newTasks[newTasks.length - 1].id,
+      task_container_id: props.id,
+      task_title: newTasks[newTasks.length - 1].taskTitle,
+      task_description: newTasks[newTasks.length - 1].taskDescription,
+    });
     props.setTaskContainerList((prev) => {
       return {
         ...prev,

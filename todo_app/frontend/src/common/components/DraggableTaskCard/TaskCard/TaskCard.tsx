@@ -15,9 +15,10 @@ import {
   MdDragIndicator,
   MdDeleteOutline,
 } from "react-icons/md";
-import { useContext, useRef, Dispatch, SetStateAction, useEffect } from "react";
+import { useContext, useRef, Dispatch, SetStateAction } from "react";
 import { DraggableContext } from "../../DraggableContainer/DraggableContext";
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
+import { fetchPut } from "../../../lib/fetch";
 
 type TaskCardProps = {
   id: string;
@@ -31,6 +32,15 @@ export function TaskCard({ ...props }: TaskCardProps) {
   const [addDescriptionFlag, setAddDescriptionFlag] = useBoolean(false);
   const draggableContext = useContext(DraggableContext);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const fetchTask = async () => {
+    await fetchPut("/api/tasks", {
+      task_id: props.id,
+      task_container_id: props.containerId,
+      task_title: props.taskTitle,
+      task_description: props.taskDescription,
+    });
+  };
 
   const updateTask = (
     field: "taskTitle" | "taskDescription",
@@ -85,6 +95,7 @@ export function TaskCard({ ...props }: TaskCardProps) {
             value={props.taskTitle}
             ml={4}
             ref={inputRef}
+            onBlur={() => fetchTask()}
             onChange={(e) => updateTask("taskTitle", e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -114,6 +125,7 @@ export function TaskCard({ ...props }: TaskCardProps) {
               variant={"unstyled"}
               placeholder={"Task Description"}
               value={props.taskDescription}
+              onBlur={() => fetchTask()}
               onChange={(e) => updateTask("taskDescription", e.target.value)}
             />
           </CardBody>

@@ -1,5 +1,4 @@
 from sqlalchemy import MetaData
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from ..session_manager.session_manager import engine
 
