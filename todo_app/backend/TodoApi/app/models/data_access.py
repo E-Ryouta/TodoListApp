@@ -20,3 +20,10 @@ class DataAccess:
             session.commit()
 
         return task
+    
+    def delete_task(self, task):
+        with SessionManager() as session:
+            session.query(Tasks).filter(Tasks.task_id == task["task_id"]).delete()
+            session.commit()
+
+        return task

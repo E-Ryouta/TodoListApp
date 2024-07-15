@@ -41,3 +41,12 @@ def put_task():
 
     update_task = todo_list_service.update_task(task)
     return jsonify(update_task)
+
+@bp.route("/tasks", methods=["DELETE"])
+def delete_task():
+    task = request.json
+    if not task:
+        return jsonify({"message": "Task not found"}), 400
+
+    todo_list_service.delete_task(task)
+    return jsonify({"message": "Task deleted"})

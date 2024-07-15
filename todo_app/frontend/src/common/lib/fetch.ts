@@ -38,6 +38,25 @@ export const fetchPut = async (
   return response.json();
 };
 
+// DELETEリクエストを送る関数
+export const fetchDelete = async (
+  endpoint: string,
+  body: { [key: string]: string }
+) => {
+  const url = getUrl(endpoint);
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+
+  return response.json();
+};
+
 // URLを作成する関数を作る
 const getUrl = (endpoint: string) => {
   const baseUrl = process.env.BACKEND_ORIGIN_CLIENT || "http://localhost:3000";

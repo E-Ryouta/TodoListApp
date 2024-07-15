@@ -18,7 +18,7 @@ import {
 import { useContext, useRef, Dispatch, SetStateAction } from "react";
 import { DraggableContext } from "../../DraggableContainer/DraggableContext";
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
-import { fetchPut } from "../../../lib/fetch";
+import { fetchPut, fetchDelete } from "../../../lib/fetch";
 
 type TaskCardProps = {
   id: string;
@@ -39,6 +39,12 @@ export function TaskCard({ ...props }: TaskCardProps) {
       task_container_id: props.containerId,
       task_title: props.taskTitle,
       task_description: props.taskDescription,
+    });
+  };
+
+  const fetchTaskDelete = async (task_id: string) => {
+    await fetchDelete("/api/tasks", {
+      task_id: task_id,
     });
   };
 
@@ -66,6 +72,7 @@ export function TaskCard({ ...props }: TaskCardProps) {
   };
 
   const deleteTask = (taskId: string) => {
+    fetchTaskDelete(taskId);
     props.setTaskContainerList?.((prev) => {
       return {
         ...prev,

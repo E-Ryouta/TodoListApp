@@ -10,3 +10,6 @@ class TodoListService:
     
     def update_task(self, task):
         return self.data_access.update_task(task)
+    
+    def delete_task(self, task):
+        self.data_access.delete_task(task)
