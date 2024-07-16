@@ -9,7 +9,8 @@ bp = Blueprint("todo_list", __name__)
 
 @bp.route("/todo_lists", methods=["GET"])
 def get_todo_list():
-    todo_list = todo_list_service.get_todo_list()
+    created_at = request.args.get("created_at")
+    todo_list = todo_list_service.get_todo_list(created_at)
 
     todo_list_dic = OrderedDict()
     for task_container, tasks in todo_list:

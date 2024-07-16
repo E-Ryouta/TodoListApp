@@ -20,6 +20,7 @@ import { arrayMove } from "@dnd-kit/sortable";
 import { UUID } from "crypto";
 import { fetchGet, fetchPut } from "./common/lib/fetch";
 import { DateBar } from "./common/components/DateBar";
+import { create } from "domain";
 
 export type TaskContanarListProps = {
   progressHeader: string;
@@ -45,11 +46,9 @@ function App() {
   const [taskContainerList, setTaskContainerList] =
     useState<TaskContainerListContextType>({});
 
-  // 画面がロードした時にAPIからデータを取得して、taskContainerListにセットする
   useEffect(() => {
     const fetchData = async () => {
-      const data = await fetchGet("/api/todo_lists", {});
-      console.log(data);
+      const data = await fetchGet("/api/todo_lists", { created_at: date });
       setTaskContainerList(
         Object.keys(data).reduce((acc: any, key: any) => {
           return {
@@ -70,7 +69,7 @@ function App() {
     };
 
     fetchData();
-  }, []);
+  }, [date]);
 
   const fetchTask = async (data: {}) => {
     await fetchPut("/api/tasks", data);
@@ -220,6 +219,7 @@ function App() {
                   <DroppableTaskContainer
                     key={key}
                     id={key as UUID}
+                    date={date}
                     tasks={taskContainers.tasks}
                     progressHeader={taskContainers.progressHeader}
                     setTaskContainerList={setTaskContainerList}

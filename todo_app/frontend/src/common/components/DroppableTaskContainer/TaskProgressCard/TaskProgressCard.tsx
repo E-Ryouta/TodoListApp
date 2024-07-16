@@ -9,12 +9,14 @@ import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
 import { v4 as uuidv4 } from "uuid";
 import { UUID } from "crypto";
 import { fetchPut } from "../../../lib/fetch";
+import { create } from "domain";
 
 type TaskProgressCardProps = {
   id: UUID;
   progressHeader: string;
   tasks: DraggableTaskCardProps[];
   containerId: string;
+  date: string;
   setTaskContainerList: Dispatch<SetStateAction<TaskContainerListContextType>>;
 };
 
@@ -38,6 +40,7 @@ export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
       task_container_id: props.id,
       task_title: newTasks[newTasks.length - 1].taskTitle,
       task_description: newTasks[newTasks.length - 1].taskDescription,
+      created_at: props.date,
     });
     props.setTaskContainerList((prev) => {
       return {

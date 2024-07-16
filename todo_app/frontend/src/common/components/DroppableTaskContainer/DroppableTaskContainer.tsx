@@ -14,6 +14,7 @@ export type DroppableTaskContainerProps = {
   id: UUID;
   progressHeader: string;
   tasks: DraggableTaskCardProps[];
+  date: string;
   setTaskContainerList: Dispatch<SetStateAction<TaskContainerListContextType>>;
 };
 
@@ -33,6 +34,7 @@ export function DroppableTaskContainer({
       <Box ref={setNodeRef} h={"100%"}>
         <TaskProgressCard
           id={props.id}
+          date={props.date}
           progressHeader={props.progressHeader}
           tasks={props.tasks}
           setTaskContainerList={props.setTaskContainerList}

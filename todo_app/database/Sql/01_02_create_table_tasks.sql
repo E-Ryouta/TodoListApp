@@ -3,5 +3,6 @@ CREATE TABLE tasks (
     task_container_id UUID NOT NULL,
     task_title VARCHAR(255) NOT NULL,
     task_description TEXT,
+    created_at TIMESTAMP NOT NULL,
     FOREIGN KEY (task_container_id) REFERENCES task_containers(task_container_id)
 );
