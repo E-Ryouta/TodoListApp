@@ -19,6 +19,7 @@ import { useContext, useRef, Dispatch, SetStateAction } from "react";
 import { DraggableContext } from "../../DraggableContainer/DraggableContext";
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
 import { fetchPut, fetchDelete } from "../../../../lib/fetch";
+import { Timer } from "../TimerCard";
 
 type TaskCardProps = {
   id: string;
@@ -88,6 +89,8 @@ export function TaskCard({ ...props }: TaskCardProps) {
 
   return (
     <Card variant={"elevated"} size={"sm"}>
+      <Timer />
+      <Divider />
       <CardHeader>
         <Flex>
           <IconButton

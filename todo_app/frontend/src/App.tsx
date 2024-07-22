@@ -13,10 +13,10 @@ function App() {
   return (
     <div>
       <Box
-        position="fixed"
-        top="80px"
+        position={"fixed"}
+        top={"80px"}
         pl={isOpen ? "200px" : "50px"}
-        display="flex"
+        display={"flex"}
         justifyContent="center"
         w={"100%"}
         bg={"tertiary"}
