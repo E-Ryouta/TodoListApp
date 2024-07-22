@@ -18,7 +18,7 @@ import {
 import { useContext, useRef, Dispatch, SetStateAction } from "react";
 import { DraggableContext } from "../../DraggableContainer/DraggableContext";
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
-import { fetchPut, fetchDelete } from "../../../lib/fetch";
+import { fetchPut, fetchDelete } from "../../../../lib/fetch";
 
 type TaskCardProps = {
   id: string;

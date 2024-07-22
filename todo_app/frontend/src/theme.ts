@@ -1,6 +1,11 @@
 import { extendTheme } from "@chakra-ui/react";
 
-const theme = extendTheme({
+export const theme = extendTheme({
+  colors: {
+    primary: "#AFD3E2",
+    secondary: "#146C94",
+    tertiary: "#FBF9F1",
+  },
   styles: {
     global: {
       body: {
@@ -12,7 +17,6 @@ const theme = extendTheme({
           left: 0,
           right: 0,
           bottom: 0,
-          bgImage: "url('kahu.png')",
           bgSize: "cover",
           opacity: 0.7,
           zIndex: -1,
@@ -21,5 +25,3 @@ const theme = extendTheme({
     },
   },
 });
-
-export default theme;

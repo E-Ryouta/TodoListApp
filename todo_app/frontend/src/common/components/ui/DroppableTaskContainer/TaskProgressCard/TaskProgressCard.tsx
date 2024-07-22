@@ -8,8 +8,7 @@ import {
 import { TaskContainerListContextType } from "../../TaskProvider/TaskContext";
 import { v4 as uuidv4 } from "uuid";
 import { UUID } from "crypto";
-import { fetchPut } from "../../../lib/fetch";
-import { create } from "domain";
+import { fetchPut } from "../../../../lib/fetch";
 
 type TaskProgressCardProps = {
   id: UUID;
@@ -55,7 +54,7 @@ export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
   };
 
   return (
-    <Card w={"500px"} borderRadius={30}>
+    <Card w={"500px"} borderRadius={30} bg={"tertiary"}>
       <Text textAlign={"center"} fontWeight={"bold"} fontSize={"xl"}>
         {props.progressHeader}
       </Text>
