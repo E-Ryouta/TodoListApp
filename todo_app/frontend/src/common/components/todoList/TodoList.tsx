@@ -31,6 +31,7 @@ export function TodoList({ date }: TodoListProps) {
     id: "" as UUID,
     taskTitle: "",
     taskDescription: "",
+    timer: 0,
   });
 
   const handleDragStart = (event: any) => {
@@ -42,6 +43,7 @@ export function TodoList({ date }: TodoListProps) {
         id: targetTask.id,
         taskTitle: targetTask.taskTitle,
         taskDescription: targetTask.taskDescription,
+        timer: targetTask.timer,
       });
     }
   };
@@ -114,16 +116,19 @@ export function TodoList({ date }: TodoListProps) {
           id: task.task_id,
           taskTitle: task.task_title,
           taskDescription: task.task_description,
+          timer: task.timer,
         })),
         inProgress: response["inProgress"].map((task: any) => ({
           id: task.task_id,
           taskTitle: task.task_title,
           taskDescription: task.task_description,
+          timer: task.timer,
         })),
         done: response["done"].map((task: any) => ({
           id: task.task_id,
           taskTitle: task.task_title,
           taskDescription: task.task_description,
+          timer: task.timer,
         })),
       };
       setTasksState(getStateTasks);

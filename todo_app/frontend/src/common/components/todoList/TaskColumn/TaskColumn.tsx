@@ -42,6 +42,7 @@ export function TaskColumn({
           id: new_id,
           taskTitle: "",
           taskDescription: "",
+          timer: 0,
         },
       ],
     }));

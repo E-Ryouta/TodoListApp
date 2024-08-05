@@ -4,12 +4,18 @@ import { useBoolean } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 
 type TimerProps = {
+  defaultTime: number;
   startClickApproveFlg: boolean;
+  updateTimer: (time: number) => void;
 };
 
-export function Timer({ startClickApproveFlg }: TimerProps) {
+export function Timer({
+  defaultTime,
+  startClickApproveFlg,
+  updateTimer,
+}: TimerProps) {
   const [isStart, setIsStart] = useBoolean();
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(defaultTime);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -22,6 +28,9 @@ export function Timer({ startClickApproveFlg }: TimerProps) {
   }, [isStart]);
 
   const handleIconClick = () => {
+    if (isStart) {
+      updateTimer(time);
+    }
     setIsStart.toggle();
   };
 

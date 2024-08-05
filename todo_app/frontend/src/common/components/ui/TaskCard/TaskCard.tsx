@@ -25,6 +25,7 @@ export type TaskCardProps = {
   id: UUID;
   taskTitle: string;
   taskDescription: string;
+  timer: number;
 };
 
 type TaskCardPropsWithSetters = {
@@ -61,8 +62,8 @@ export function TaskCard({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const updateTask = (
-    field: "taskTitle" | "taskDescription",
-    value: string
+    field: "taskTitle" | "taskDescription" | "timer",
+    value: string | number
   ) => {
     handleUpdateTask(containerId, id, {
       ...task,
@@ -75,7 +76,11 @@ export function TaskCard({
       <FormControl>
         {addTimerFlag && (
           <Box>
-            <Timer startClickApproveFlg={startClickApproveFlg} />
+            <Timer
+              defaultTime={task.timer}
+              startClickApproveFlg={startClickApproveFlg}
+              updateTimer={(time) => updateTask("timer", time)}
+            />
             <Divider />
           </Box>
         )}
