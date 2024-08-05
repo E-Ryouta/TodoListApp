@@ -1,4 +1,4 @@
-import { HStack } from "@chakra-ui/react";
+import { HStack, useBoolean } from "@chakra-ui/react";
 import { TaskCard } from "../ui/TaskCard";
 import type { TaskCardProps } from "../ui/TaskCard/TaskCard";
 import {
@@ -11,13 +11,14 @@ import { useEffect, useState } from "react";
 import { UUID } from "crypto";
 import { arrayMove } from "@dnd-kit/sortable";
 import { TaskColumn } from "./TaskColumn";
-import { getTodoList } from "../../endpoints";
+import { getTodoList, putTasks } from "../../endpoints";
 
 export type TodoListProps = {
   date: string;
 };
 
 export function TodoList({ date }: TodoListProps) {
+  const [isChangeFlg, setIsChangeFlg] = useBoolean(false);
   const [tasksState, setTasksState] = useState<Record<string, TaskCardProps[]>>(
     {
       todo: [],
@@ -69,6 +70,8 @@ export function TodoList({ date }: TodoListProps) {
         [activeContainerId]: newTasks,
         [overContainerId]: [...prev[overContainerId], insertTask],
       }));
+
+      setIsChangeFlg.on();
     }
   };
 
@@ -89,6 +92,17 @@ export function TodoList({ date }: TodoListProps) {
         ...prev,
         [activeContainerId]: newTasks,
       }));
+    }
+
+    if (isChangeFlg) {
+      putTasks({
+        task_id: activeTask.id,
+        task_container_id: activeContainerId,
+        task_title: activeTask.taskTitle,
+        task_description: activeTask.taskDescription,
+        created_at: date,
+      });
+      setIsChangeFlg.off();
     }
   };
 
@@ -147,6 +161,8 @@ export function TodoList({ date }: TodoListProps) {
           id={activeTask.id as UUID}
           containerId={"todo"}
           task={activeTask}
+          addTimerFlag={false}
+          startClickApproveFlg={false}
           handleDeleteTask={() => {}}
           handleUpdateTask={() => {}}
           handleOnBlur={() => {}}

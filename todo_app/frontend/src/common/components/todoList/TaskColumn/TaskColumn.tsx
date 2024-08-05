@@ -93,12 +93,14 @@ export function TaskColumn({
               <DraggableContainer id={task.id as UUID} key={task.id as UUID}>
                 <Box sx={{ margin: "1em" }}>
                   <TaskCard
-                    id={task.id as UUID}
                     task={task}
+                    id={task.id as UUID}
                     containerId={containerId}
+                    addTimerFlag={containerId !== "todo"}
+                    startClickApproveFlg={containerId !== "inProgress"}
+                    handleOnBlur={handleOnBlur}
                     handleDeleteTask={handleDeleteTask}
                     handleUpdateTask={handleUpdateTask}
-                    handleOnBlur={handleOnBlur}
                   />
                 </Box>
               </DraggableContainer>

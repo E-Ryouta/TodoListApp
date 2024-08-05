@@ -3,7 +3,11 @@ import { MdOutlineNotStarted, MdOutlineStopCircle } from "react-icons/md";
 import { useBoolean } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 
-export function Timer() {
+type TimerProps = {
+  startClickApproveFlg: boolean;
+};
+
+export function Timer({ startClickApproveFlg }: TimerProps) {
   const [isStart, setIsStart] = useBoolean();
   const [time, setTime] = useState(0);
 
@@ -51,6 +55,7 @@ export function Timer() {
           aria-label="StartAndStopButton"
           variant={"ghost"}
           onClick={handleIconClick}
+          isDisabled={startClickApproveFlg}
           icon={
             isStart ? (
               <MdOutlineStopCircle size={"lg"} />

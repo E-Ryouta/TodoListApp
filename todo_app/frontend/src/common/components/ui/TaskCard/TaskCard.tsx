@@ -29,8 +29,10 @@ export type TaskCardProps = {
 
 type TaskCardPropsWithSetters = {
   id: UUID;
-  containerId: string;
   task: TaskCardProps;
+  containerId: string;
+  addTimerFlag: boolean;
+  startClickApproveFlg: boolean;
   handleDeleteTask: (containerId: string, taskId: string) => void;
   handleUpdateTask: (
     containerId: string,
@@ -46,14 +48,15 @@ type TaskCardPropsWithSetters = {
 
 export function TaskCard({
   id,
-  containerId,
   task,
+  containerId,
+  addTimerFlag,
+  startClickApproveFlg,
   handleDeleteTask,
   handleUpdateTask,
   handleOnBlur,
 }: TaskCardPropsWithSetters) {
   const [addDescriptionFlag, setAddDescriptionFlag] = useBoolean(false);
-  const [addTimerFlag, setAddTimerFlag] = useBoolean(false);
   const draggableContext = useContext(DraggableContext);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -72,7 +75,7 @@ export function TaskCard({
       <FormControl>
         {addTimerFlag && (
           <Box>
-            <Timer />
+            <Timer startClickApproveFlg={startClickApproveFlg} />
             <Divider />
           </Box>
         )}
