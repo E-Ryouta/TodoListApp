@@ -1,9 +1,9 @@
 import { createContext, Dispatch, SetStateAction } from "react";
-import type { DraggableTaskCardProps } from "../DraggableTaskCard";
+import type { TaskCardProps } from "../TaskCard";
 
 export type TaskContanarListProps = {
   progressHeader: string;
-  tasks: DraggableTaskCardProps[];
+  tasks: TaskCardProps[];
 };
 
 export type TaskContainerListContextType = {

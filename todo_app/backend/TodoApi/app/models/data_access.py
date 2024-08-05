@@ -5,23 +5,11 @@ from sqlalchemy import cast, Date
 
 
 class DataAccess:
-    def get_all_todo_list(self, created_at):
+    def get_date_todo_list(self, created_at):
         with SessionManager() as session:
-            # サブクエリでTasksから該当の日付のデータを取得
-            tasks_subquery = (
+            todo_list = (
                 session.query(Tasks)
                 .filter(cast(Tasks.created_at, Date) == created_at)
-                .subquery()
-            )
-
-            # エイリアスを作成
-            TasksAlias = aliased(Tasks, tasks_subquery)
-
-            # TaskContainersとTasksAliasを外部結合
-            todo_list = (
-                session.query(TaskContainers, TasksAlias)
-                .outerjoin(TasksAlias, TaskContainers.task_container_id == TasksAlias.task_container_id)
-                .order_by(TaskContainers.task_container_order_index)
                 .all()
             )
         

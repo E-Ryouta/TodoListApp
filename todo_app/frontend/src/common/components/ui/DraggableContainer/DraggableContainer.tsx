@@ -10,7 +10,7 @@ type DraggableContainerProps = {
 
 export function DraggableContainer({ ...props }: DraggableContainerProps) {
   const { active, attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: props.id });
+    useSortable({ id: props.id, animateLayoutChanges: () => false });
 
   const style = {
     opacity: props.id === active?.id ? 0.5 : 1,

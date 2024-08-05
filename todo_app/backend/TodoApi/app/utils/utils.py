@@ -1,6 +1,6 @@
 import uuid
 
-def model_to_dict(model): 
+def model_to_obj(model): 
     dict_obj = {}
     for column in model.__table__.columns:
         value = getattr(model, column.name)

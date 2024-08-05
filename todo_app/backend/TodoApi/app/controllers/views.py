@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from ..services.business_logic import TodoListService
-from ..utils.utils import model_to_dict
+from ..utils.utils import model_to_obj
 from flask import request
 from collections import OrderedDict
 
@@ -12,31 +12,25 @@ def get_todo_list():
     created_at = request.args.get("created_at")
     todo_list = todo_list_service.get_todo_list(created_at)
 
-    todo_list_dic = OrderedDict()
-    for task_container, tasks in todo_list:
-        task_container_dic = model_to_dict(task_container)
-        task_dic = [] if not tasks else [model_to_dict(tasks)]
+    todo_list_obj = OrderedDict(
+        {
+            "todo": [],
+            "inProgress": [],
+            "done": [],
+        }
+    )
+    for tasks in todo_list:
+        task_obj = model_to_obj(tasks)
 
-        if (
-            todo_list_dic != {}
-            and task_container_dic["task_container_id"] in todo_list_dic
-        ):
-            todo_list_dic[task_container_dic["task_container_id"]]["tasks"].extend(
-                task_dic
-            )
-        else:
-            todo_list_dic[task_container_dic["task_container_id"]] = {
-                "taskContainer": task_container_dic,
-                "tasks": task_dic,
-            }
+        if (task_obj["task_container_id"] in todo_list_obj):
+            todo_list_obj[task_obj["task_container_id"]].append(task_obj)
 
-    return jsonify(list(todo_list_dic.values()))
+    return jsonify(todo_list_obj).json
 
 
 @bp.route("/tasks", methods=["PUT"])
 def put_task():
     task = request.json
-    print(task)
     if not task:
         return jsonify({"message": "Task not found"}), 400
 

@@ -1,130 +1,75 @@
 import { HStack } from "@chakra-ui/react";
-import { DroppableTaskContainer } from "../ui/DroppableTaskContainer";
-import { DndContext, DragOverlay } from "@dnd-kit/core";
-import { TaskCard } from "../ui/DraggableTaskCard";
+import { TaskCard } from "../ui/TaskCard";
+import type { TaskCardProps } from "../ui/TaskCard/TaskCard";
+import {
+  DndContext,
+  DragOverlay,
+  DragEndEvent,
+  closestCenter,
+} from "@dnd-kit/core";
 import { useEffect, useState } from "react";
-import { arrayMove } from "@dnd-kit/sortable";
 import { UUID } from "crypto";
-import { getTodoList, putTasks } from "../../endpoints";
-import { useBoolean } from "@chakra-ui/react";
-import { DragEndEvent } from "@dnd-kit/core";
-import type { DraggableTaskCardProps } from "../ui/DraggableTaskCard";
-
-export type TaskContanarListProps = {
-  progressHeader: string;
-  tasks: DraggableTaskCardProps[];
-};
-
-export type TaskContainerListContextType = {
-  [key: UUID]: TaskContanarListProps;
-};
+import { arrayMove } from "@dnd-kit/sortable";
+import { TaskColumn } from "./TaskColumn";
+import { getTodoList } from "../../endpoints";
 
 export type TodoListProps = {
   date: string;
 };
 
 export function TodoList({ date }: TodoListProps) {
-  const [isChange, setIsChange] = useBoolean(false);
-  const [taskContainerList, setTaskContainerList] =
-    useState<TaskContainerListContextType>({});
-  const [activeTask, setActiveTask] = useState({
-    id: "",
-    data: {
-      taskTitle: "",
-      taskDescription: "",
-    },
+  const [tasksState, setTasksState] = useState<Record<string, TaskCardProps[]>>(
+    {
+      todo: [],
+      inProgress: [],
+      done: [],
+    }
+  );
+
+  const [activeTask, setActiveTask] = useState<TaskCardProps>({
+    id: "" as UUID,
+    taskTitle: "",
+    taskDescription: "",
   });
-
-  useEffect(() => {
-    const fetchData = async (date: string) => {
-      const data = await getTodoList(date);
-      setTaskContainerList(
-        Object.keys(data).reduce((acc: any, key: any) => {
-          return {
-            ...acc,
-            [data[key].taskContainer.task_container_id]: {
-              progressHeader: data[key].taskContainer.progress_header,
-              tasks: Object.values(data[key].tasks).map((task: any) => {
-                return {
-                  id: task.task_id,
-                  taskTitle: task.task_title,
-                  taskDescription: task.task_description,
-                };
-              }),
-            },
-          };
-        }, {})
-      );
-    };
-
-    fetchData(date);
-  }, [date]);
-
-  const fetchTask = async (data: {}) => {
-    await putTasks(data);
-  };
 
   const handleDragStart = (event: any) => {
     const { id } = event.active;
-
     const containerId = event.active.data.current.sortable.containerId;
-    const activeTaskTitle =
-      taskContainerList[containerId].tasks.find((task) => task.id === id)
-        ?.taskTitle ?? "";
-    const activeTaskDescription =
-      taskContainerList[containerId].tasks.find((task) => task.id === id)
-        ?.taskDescription ?? "";
-
-    setActiveTask({
-      id: id,
-      data: {
-        taskTitle: activeTaskTitle,
-        taskDescription: activeTaskDescription,
-      },
-    });
+    const targetTask = tasksState[containerId].find((task) => task.id === id);
+    if (targetTask) {
+      setActiveTask({
+        id: targetTask.id,
+        taskTitle: targetTask.taskTitle,
+        taskDescription: targetTask.taskDescription,
+      });
+    }
   };
 
   const handleDragOver = (event: any) => {
     const { active, over } = event;
-    if (!over) {
-      return;
-    }
+    if (!over) return;
 
-    const activeContainerId = active?.data?.current?.sortable.containerId;
-    const overContainerId = taskContainerList[over.id]
+    const activeContainerId = active.data.current.sortable.containerId;
+    const overContainerId = tasksState[over.id]
       ? over.id
-      : over?.data?.current?.sortable.containerId;
+      : over.data.current.sortable.containerId;
+    if (!overContainerId || activeContainerId === overContainerId) return;
 
-    if (!overContainerId) {
-      return;
-    }
-
-    if (activeContainerId === overContainerId) {
-      return;
-    }
-
-    const newTasks = taskContainerList[activeContainerId].tasks.filter(
+    const newTasks = tasksState[activeContainerId].filter(
       (task) => task.id !== active.id
     );
 
-    const insertTask = taskContainerList[activeContainerId].tasks.find(
+    const insertTask = tasksState[activeContainerId].find(
       (task) => task.id === active.id
     );
 
-    setTaskContainerList((prev) => {
-      setIsChange.on();
-      return {
+    if (insertTask) {
+      setTasksState((prev) => ({
         ...prev,
-        [activeContainerId]: {
-          progressHeader: prev[activeContainerId].progressHeader,
-          tasks: newTasks,
-        },
-        [overContainerId]: {
-          progressHeader: prev[overContainerId].progressHeader,
-          tasks: [...prev[overContainerId].tasks, insertTask],
-        },
-      };
-    });
+        [activeContainerId]: newTasks,
+        [overContainerId]: [...prev[overContainerId], insertTask],
+      }));
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -135,35 +80,47 @@ export function TodoList({ date }: TodoListProps) {
 
     if (activeContainerId === overContainerId) {
       const newTasks = arrayMove(
-        taskContainerList[activeContainerId].tasks,
-        active?.data.current?.sortable.index,
-        over?.data.current?.sortable.index
+        tasksState[activeContainerId],
+        active?.data?.current?.sortable.index,
+        over?.data?.current?.sortable.index
       );
 
-      setTaskContainerList((prev) => {
-        return {
-          ...prev,
-          [activeContainerId]: {
-            progressHeader: prev[activeContainerId].progressHeader,
-            tasks: newTasks,
-          },
-        };
-      });
-    }
-
-    if (isChange) {
-      fetchTask({
-        task_id: active.id,
-        task_container_id: activeContainerId,
-        task_title: activeTask.data.taskTitle,
-        task_description: activeTask.data.taskDescription,
-      });
-      setIsChange.off();
+      setTasksState((prev) => ({
+        ...prev,
+        [activeContainerId]: newTasks,
+      }));
     }
   };
 
+  useEffect(() => {
+    const fetchTasks = async () => {
+      const response = await getTodoList(date);
+      const getStateTasks = {
+        todo: response["todo"].map((task: any) => ({
+          id: task.task_id,
+          taskTitle: task.task_title,
+          taskDescription: task.task_description,
+        })),
+        inProgress: response["inProgress"].map((task: any) => ({
+          id: task.task_id,
+          taskTitle: task.task_title,
+          taskDescription: task.task_description,
+        })),
+        done: response["done"].map((task: any) => ({
+          id: task.task_id,
+          taskTitle: task.task_title,
+          taskDescription: task.task_description,
+        })),
+      };
+      setTasksState(getStateTasks);
+    };
+
+    fetchTasks();
+  }, [date]);
+
   return (
     <DndContext
+      collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onDragOver={handleDragOver}
@@ -175,23 +132,24 @@ export function TodoList({ date }: TodoListProps) {
         align={"flex-start"}
         overflowX={"auto"}
       >
-        {Object.entries(taskContainerList).map(([key, taskContainers]) => (
-          <DroppableTaskContainer
-            key={key}
-            id={key as UUID}
+        {Object.entries(tasksState).map(([taskContainerId, tasks]) => (
+          <TaskColumn
+            tasks={tasks}
+            key={taskContainerId}
             date={date}
-            tasks={taskContainers.tasks}
-            progressHeader={taskContainers.progressHeader}
-            setTaskContainerList={setTaskContainerList}
+            containerId={taskContainerId}
+            setTasksState={setTasksState}
           />
         ))}
       </HStack>
       <DragOverlay>
         <TaskCard
-          id={activeTask.id}
-          taskTitle={activeTask.data.taskTitle}
-          taskDescription={activeTask.data.taskDescription}
-          containerId={""}
+          id={activeTask.id as UUID}
+          containerId={"todo"}
+          task={activeTask}
+          handleDeleteTask={() => {}}
+          handleUpdateTask={() => {}}
+          handleOnBlur={() => {}}
         />
       </DragOverlay>
     </DndContext>
