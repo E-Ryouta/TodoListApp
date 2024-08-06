@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { DroppableContainer } from "../../ui/DroppableContainer";
 import { TaskProgressCard } from "../../ui/TaskProgressCard";
 import { TaskCard } from "../../ui/TaskCard";
@@ -14,17 +14,24 @@ type TaskColumnProps = {
   date: string;
   tasks: TaskCardProps[];
   containerId: string;
-  setTasksState: React.Dispatch<
-    React.SetStateAction<Record<string, TaskCardProps[]>>
-  >;
+  handleUpdateTodoState: (newState: Record<string, TaskCardProps[]>) => void;
 };
 
 export function TaskColumn({
   date,
   tasks,
   containerId,
-  setTasksState,
+  handleUpdateTodoState,
 }: TaskColumnProps) {
+  const [containerState, setContainerState] = useState<TaskCardProps[]>(
+    tasks || []
+  );
+
+  useEffect(() => {
+    handleUpdateTodoState({ [containerId]: containerState });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containerState]);
+
   const handleAddTask = async (containerId: string) => {
     const new_id = uuid4v() as UUID;
     await putTasks({
@@ -34,37 +41,20 @@ export function TaskColumn({
       task_description: "",
       created_at: date,
     });
-    setTasksState((prev) => ({
+    setContainerState((prev) => [
       ...prev,
-      [containerId]: [
-        ...prev[containerId],
-        {
-          id: new_id,
-          taskTitle: "",
-          taskDescription: "",
-          timer: 0,
-        },
-      ],
-    }));
+      {
+        id: new_id,
+        taskTitle: "",
+        taskDescription: "",
+        timer: 0,
+      },
+    ]);
   };
 
   const handleDeleteTask = async (containerId: string, taskId: string) => {
     await fetchDelete("/api/tasks", { task_id: taskId });
-    setTasksState((prev) => ({
-      ...prev,
-      [containerId]: prev[containerId].filter((task) => task.id !== taskId),
-    }));
-  };
-
-  const handleUpdateTask = (
-    containerId: string,
-    taskId: string,
-    task: TaskCardProps
-  ) => {
-    setTasksState((prev) => ({
-      ...prev,
-      [containerId]: prev[containerId].map((t) => (t.id === taskId ? task : t)),
-    }));
+    setContainerState((prev) => prev.filter((task) => task.id !== taskId));
   };
 
   const handleOnBlur = async (
@@ -77,8 +67,28 @@ export function TaskColumn({
       task_container_id: containerId,
       task_title: task.taskTitle,
       task_description: task.taskDescription,
+      timer: task.timer,
       created_at: date,
     });
+
+    setContainerState((prev) => prev.map((t) => (t.id === taskId ? task : t)));
+  };
+
+  const handleTimerUpdate = async (
+    containerId: string,
+    taskId: string,
+    task: TaskCardProps
+  ) => {
+    await putTasks({
+      task_id: taskId,
+      task_container_id: containerId,
+      task_title: task.taskTitle,
+      task_description: task.taskDescription,
+      timer: task.timer,
+      created_at: date,
+    });
+
+    setContainerState((prev) => prev.map((t) => (t.id === taskId ? task : t)));
   };
 
   return (
@@ -100,8 +110,8 @@ export function TaskColumn({
                     addTimerFlag={containerId !== "todo"}
                     startClickApproveFlg={containerId !== "inProgress"}
                     handleOnBlur={handleOnBlur}
+                    handleTimerUpdate={handleTimerUpdate}
                     handleDeleteTask={handleDeleteTask}
-                    handleUpdateTask={handleUpdateTask}
                   />
                 </Box>
               </DraggableContainer>

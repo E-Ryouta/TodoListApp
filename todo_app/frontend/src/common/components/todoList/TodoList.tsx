@@ -19,13 +19,11 @@ export type TodoListProps = {
 
 export function TodoList({ date }: TodoListProps) {
   const [isChangeFlg, setIsChangeFlg] = useBoolean(false);
-  const [tasksState, setTasksState] = useState<Record<string, TaskCardProps[]>>(
-    {
-      todo: [],
-      inProgress: [],
-      done: [],
-    }
-  );
+  const [todoState, setTodoState] = useState<Record<string, TaskCardProps[]>>({
+    todo: [],
+    inProgress: [],
+    done: [],
+  });
 
   const [activeTask, setActiveTask] = useState<TaskCardProps>({
     id: "" as UUID,
@@ -34,10 +32,17 @@ export function TodoList({ date }: TodoListProps) {
     timer: 0,
   });
 
+  const handleUpdateTodoState = (newState: Record<string, TaskCardProps[]>) => {
+    setTodoState((prev) => ({
+      ...prev,
+      ...newState,
+    }));
+  };
+
   const handleDragStart = (event: any) => {
     const { id } = event.active;
     const containerId = event.active.data.current.sortable.containerId;
-    const targetTask = tasksState[containerId].find((task) => task.id === id);
+    const targetTask = todoState[containerId].find((task) => task.id === id);
     if (targetTask) {
       setActiveTask({
         id: targetTask.id,
@@ -53,21 +58,21 @@ export function TodoList({ date }: TodoListProps) {
     if (!over) return;
 
     const activeContainerId = active.data.current.sortable.containerId;
-    const overContainerId = tasksState[over.id]
+    const overContainerId = todoState[over.id]
       ? over.id
       : over.data.current.sortable.containerId;
     if (!overContainerId || activeContainerId === overContainerId) return;
 
-    const newTasks = tasksState[activeContainerId].filter(
+    const newTasks = todoState[activeContainerId].filter(
       (task) => task.id !== active.id
     );
 
-    const insertTask = tasksState[activeContainerId].find(
+    const insertTask = todoState[activeContainerId].find(
       (task) => task.id === active.id
     );
 
     if (insertTask) {
-      setTasksState((prev) => ({
+      setTodoState((prev) => ({
         ...prev,
         [activeContainerId]: newTasks,
         [overContainerId]: [...prev[overContainerId], insertTask],
@@ -85,12 +90,12 @@ export function TodoList({ date }: TodoListProps) {
 
     if (activeContainerId === overContainerId) {
       const newTasks = arrayMove(
-        tasksState[activeContainerId],
+        todoState[activeContainerId],
         active?.data?.current?.sortable.index,
         over?.data?.current?.sortable.index
       );
 
-      setTasksState((prev) => ({
+      setTodoState((prev) => ({
         ...prev,
         [activeContainerId]: newTasks,
       }));
@@ -131,7 +136,7 @@ export function TodoList({ date }: TodoListProps) {
           timer: task.timer,
         })),
       };
-      setTasksState(getStateTasks);
+      setTodoState(getStateTasks);
     };
 
     fetchTasks();
@@ -151,13 +156,13 @@ export function TodoList({ date }: TodoListProps) {
         align={"flex-start"}
         overflowX={"auto"}
       >
-        {Object.entries(tasksState).map(([taskContainerId, tasks]) => (
+        {Object.entries(todoState).map(([taskContainerId, tasks]) => (
           <TaskColumn
             tasks={tasks}
             key={taskContainerId}
             date={date}
             containerId={taskContainerId}
-            setTasksState={setTasksState}
+            handleUpdateTodoState={handleUpdateTodoState}
           />
         ))}
       </HStack>
@@ -168,8 +173,8 @@ export function TodoList({ date }: TodoListProps) {
           task={activeTask}
           addTimerFlag={false}
           startClickApproveFlg={false}
+          handleTimerUpdate={() => {}}
           handleDeleteTask={() => {}}
-          handleUpdateTask={() => {}}
           handleOnBlur={() => {}}
         />
       </DragOverlay>

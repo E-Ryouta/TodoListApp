@@ -6,13 +6,13 @@ import { useState, useEffect } from "react";
 type TimerProps = {
   defaultTime: number;
   startClickApproveFlg: boolean;
-  updateTimer: (time: number) => void;
+  updateTimerSettings: (time: number) => void;
 };
 
 export function Timer({
   defaultTime,
   startClickApproveFlg,
-  updateTimer,
+  updateTimerSettings,
 }: TimerProps) {
   const [isStart, setIsStart] = useBoolean();
   const [time, setTime] = useState(defaultTime);
@@ -29,7 +29,7 @@ export function Timer({
 
   const handleIconClick = () => {
     if (isStart) {
-      updateTimer(time);
+      updateTimerSettings(time);
     }
     setIsStart.toggle();
   };
