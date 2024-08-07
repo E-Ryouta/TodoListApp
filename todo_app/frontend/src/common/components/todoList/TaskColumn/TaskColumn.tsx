@@ -14,7 +14,10 @@ type TaskColumnProps = {
   date: string;
   tasks: TaskCardProps[];
   containerId: string;
-  handleUpdateTodoState: (newState: Record<string, TaskCardProps[]>) => void;
+  handleUpdateTodoState: (
+    containerId: string,
+    updatedTasks: TaskCardProps[]
+  ) => void;
 };
 
 export function TaskColumn({
@@ -23,12 +26,14 @@ export function TaskColumn({
   containerId,
   handleUpdateTodoState,
 }: TaskColumnProps) {
-  const [containerState, setContainerState] = useState<TaskCardProps[]>(
-    tasks || []
-  );
+  const [containerState, setContainerState] = useState<TaskCardProps[]>(tasks);
 
   useEffect(() => {
-    handleUpdateTodoState({ [containerId]: containerState });
+    setContainerState(tasks);
+  }, [tasks]);
+
+  useEffect(() => {
+    handleUpdateTodoState(containerId, containerState);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [containerState]);
 
@@ -67,7 +72,7 @@ export function TaskColumn({
       task_container_id: containerId,
       task_title: task.taskTitle,
       task_description: task.taskDescription,
-      timer: task.timer,
+      task_timer: task.timer,
       created_at: date,
     });
 
@@ -84,7 +89,7 @@ export function TaskColumn({
       task_container_id: containerId,
       task_title: task.taskTitle,
       task_description: task.taskDescription,
-      timer: task.timer,
+      task_timer: task.timer,
       created_at: date,
     });
 

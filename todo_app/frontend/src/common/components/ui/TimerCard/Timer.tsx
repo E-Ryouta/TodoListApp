@@ -1,5 +1,6 @@
 import { HStack, VStack, Text, IconButton, Box } from "@chakra-ui/react";
 import { MdOutlineNotStarted, MdOutlineStopCircle } from "react-icons/md";
+import { IoReloadCircle } from "react-icons/io5";
 import { useBoolean } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
 
@@ -32,6 +33,12 @@ export function Timer({
       updateTimerSettings(time);
     }
     setIsStart.toggle();
+  };
+
+  const handleResetClick = () => {
+    setTime(0);
+    updateTimerSettings(0);
+    setIsStart.off();
   };
 
   const formatTime = (time: number) => {
@@ -72,6 +79,13 @@ export function Timer({
               <MdOutlineNotStarted size={"lg"} />
             )
           }
+        />
+        <IconButton
+          aria-label="ResetButton"
+          variant={"ghost"}
+          onClick={handleResetClick}
+          isDisabled={startClickApproveFlg}
+          icon={<IoReloadCircle size={"lg"} fontStyle={"bold"} />}
         />
       </HStack>
     </Box>

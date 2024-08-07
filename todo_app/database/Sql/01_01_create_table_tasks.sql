@@ -3,5 +3,6 @@ CREATE TABLE tasks (
     task_container_id VARCHAR(10) NOT NULL,
     task_title VARCHAR(255) NOT NULL,
     task_description TEXT,
+    task_timer INT DEFAULT 0 NOT NULL,
     created_at TIMESTAMP NOT NULL
 );

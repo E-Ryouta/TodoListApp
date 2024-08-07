@@ -7,7 +7,7 @@ import {
   DragEndEvent,
   closestCenter,
 } from "@dnd-kit/core";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { UUID } from "crypto";
 import { arrayMove } from "@dnd-kit/sortable";
 import { TaskColumn } from "./TaskColumn";
@@ -32,12 +32,16 @@ export function TodoList({ date }: TodoListProps) {
     timer: 0,
   });
 
-  const handleUpdateTodoState = (newState: Record<string, TaskCardProps[]>) => {
-    setTodoState((prev) => ({
-      ...prev,
-      ...newState,
-    }));
-  };
+  const handleUpdateTodoState = useCallback(
+    (containerId: string, updatedTasks: TaskCardProps[]) => {
+      setTodoState((prev) => ({
+        ...prev,
+        [containerId]: updatedTasks,
+      }));
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [todoState]
+  );
 
   const handleDragStart = (event: any) => {
     const { id } = event.active;
@@ -121,19 +125,19 @@ export function TodoList({ date }: TodoListProps) {
           id: task.task_id,
           taskTitle: task.task_title,
           taskDescription: task.task_description,
-          timer: task.timer,
+          timer: task.task_timer,
         })),
         inProgress: response["inProgress"].map((task: any) => ({
           id: task.task_id,
           taskTitle: task.task_title,
           taskDescription: task.task_description,
-          timer: task.timer,
+          timer: task.task_timer,
         })),
         done: response["done"].map((task: any) => ({
           id: task.task_id,
           taskTitle: task.task_title,
           taskDescription: task.task_description,
-          timer: task.timer,
+          timer: task.task_timer,
         })),
       };
       setTodoState(getStateTasks);

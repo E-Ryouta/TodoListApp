@@ -7,10 +7,6 @@ meta = MetaData()
 meta.reflect(bind=engine)
 Base = declarative_base(metadata=meta)
 
-class TaskContainers(Base):
-     __tablename__ = "task_containers"
-     __table_args__ = {"autoload": True}
-
 
 class Tasks(Base):
      __tablename__ = "tasks"
