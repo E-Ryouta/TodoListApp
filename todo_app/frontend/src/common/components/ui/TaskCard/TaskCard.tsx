@@ -16,10 +16,11 @@ import {
   MdDragIndicator,
   MdDeleteOutline,
 } from "react-icons/md";
-import { useContext, useRef, useState } from "react";
+import { useContext, useMemo, useRef, useState } from "react";
 import { DraggableContext } from "../DraggableContainer/DraggableContext";
 import { Timer } from "../TimerCard";
 import type { UUID } from "crypto";
+import React from "react";
 
 export type TaskCardProps = {
   id: UUID;
@@ -31,39 +32,52 @@ export type TaskCardProps = {
 type TaskCardPropsWithSetters = {
   id: UUID;
   task: TaskCardProps;
-  containerId: string;
   addTimerFlag: boolean;
   startClickApproveFlg: boolean;
-  handleDeleteTask: (containerId: string, taskId: string) => void;
-  handleTimerUpdate: (
-    containerId: string,
-    taskId: string,
-    task: TaskCardProps
-  ) => void;
-  handleOnBlur: (
-    containerId: string,
-    taskId: string,
-    task: TaskCardProps
-  ) => void;
+  forceStopTimerFlg: boolean;
+  handleDeleteTask: (taskId: string) => void;
+  handleTimerUpdate: (taskId: string, task: TaskCardProps) => void;
+  handleOnBlur: (taskId: string, task: TaskCardProps) => void;
 };
 
 export function TaskCard({
   id,
   task,
-  containerId,
   addTimerFlag,
   startClickApproveFlg,
+  forceStopTimerFlg,
   handleDeleteTask,
   handleTimerUpdate,
   handleOnBlur,
 }: TaskCardPropsWithSetters) {
   const [addDescriptionFlag, setAddDescriptionFlag] = useBoolean(false);
+  const [isStart, setIsStart] = useBoolean();
   const [taskTitle, setTaskTitle] = useState(task.taskTitle || "");
   const [taskDescription, setTaskDescription] = useState(
     task.taskDescription || ""
   );
+  const [animateTimerIcon, setAnimateTimerIcon] = useBoolean(false);
   const draggableContext = useContext(DraggableContext);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputTitleRef = useRef<HTMLInputElement>(null);
+
+  const handleTimerStartSettings = (time: number) => {
+    if (isStart) {
+      handleTimerUpdate(id, { ...task, timer: time });
+    }
+    setIsStart.toggle();
+  };
+
+  const handleTimerResetSettings = () => {
+    handleTimerUpdate(id, { ...task, timer: 0 });
+    setIsStart.off();
+  };
+
+  const handleAnimateTimerIcon = () => {
+    if (isStart) setAnimateTimerIcon.on();
+    setTimeout(() => {
+      setAnimateTimerIcon.off();
+    }, 1000);
+  };
 
   return (
     <Card variant={"elevated"} size={"sm"}>
@@ -71,11 +85,12 @@ export function TaskCard({
         {addTimerFlag && (
           <Box>
             <Timer
+              isStart={isStart}
+              animateTimerIcon={animateTimerIcon}
               defaultTime={task.timer}
               startClickApproveFlg={startClickApproveFlg}
-              updateTimerSettings={(time) =>
-                handleTimerUpdate(containerId, id, { ...task, timer: time })
-              }
+              updateTimerSettings={handleTimerStartSettings}
+              resetTimerSettings={handleTimerResetSettings}
             />
             <Divider />
           </Box>
@@ -86,20 +101,20 @@ export function TaskCard({
               variant={"ghost"}
               aria-label={"drag"}
               icon={<MdDragIndicator />}
-              {...draggableContext?.attributes}
-              {...draggableContext?.listeners}
+              onClick={handleAnimateTimerIcon}
+              {...(!isStart && draggableContext?.attributes)}
+              {...(!isStart && draggableContext?.listeners)}
             />
             <Input
               ml={4}
               variant={"unstyled"}
               value={taskTitle}
-              onBlur={() =>
-                handleOnBlur(containerId, id, { ...task, taskTitle })
-              }
+              ref={inputTitleRef}
+              onBlur={() => handleOnBlur(id, { ...task, taskTitle })}
               onChange={(e) => setTaskTitle(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  inputRef.current?.blur();
+                  inputTitleRef.current?.blur();
                 }
               }}
             />
@@ -113,7 +128,7 @@ export function TaskCard({
               variant={"ghost"}
               aria-label="delete"
               icon={<MdDeleteOutline />}
-              onClick={() => handleDeleteTask(containerId, id)}
+              onClick={() => handleDeleteTask(id)}
             />
           </Flex>
         </CardHeader>
@@ -125,9 +140,7 @@ export function TaskCard({
                 variant={"unstyled"}
                 placeholder={"Task Description"}
                 value={taskDescription}
-                onBlur={() =>
-                  handleOnBlur(containerId, id, { ...task, taskDescription })
-                }
+                onBlur={() => handleOnBlur(id, { ...task, taskDescription })}
                 onChange={(e) => setTaskDescription(e.target.value)}
               />
             </CardBody>

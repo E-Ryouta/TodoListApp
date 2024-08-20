@@ -1,4 +1,4 @@
-import { HStack, useBoolean } from "@chakra-ui/react";
+import { Box, HStack, useBoolean } from "@chakra-ui/react";
 import { TaskCard } from "../ui/TaskCard";
 import type { TaskCardProps } from "../ui/TaskCard/TaskCard";
 import {
@@ -40,7 +40,7 @@ export function TodoList({ date }: TodoListProps) {
       }));
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [todoState]
+    []
   );
 
   const handleDragStart = (event: any) => {
@@ -155,28 +155,29 @@ export function TodoList({ date }: TodoListProps) {
     >
       <HStack
         h={"100%"}
-        pt={"70px"}
-        spacing={"2rem"}
+        spacing={"4rem"}
         align={"flex-start"}
         overflowX={"auto"}
       >
         {Object.entries(todoState).map(([taskContainerId, tasks]) => (
-          <TaskColumn
-            tasks={tasks}
-            key={taskContainerId}
-            date={date}
-            containerId={taskContainerId}
-            handleUpdateTodoState={handleUpdateTodoState}
-          />
+          <Box w={"700px"}>
+            <TaskColumn
+              tasks={tasks}
+              key={taskContainerId}
+              date={date}
+              containerId={taskContainerId}
+              handleUpdateTodoState={handleUpdateTodoState}
+            />
+          </Box>
         ))}
       </HStack>
       <DragOverlay>
         <TaskCard
           id={activeTask.id as UUID}
-          containerId={"todo"}
           task={activeTask}
           addTimerFlag={false}
           startClickApproveFlg={false}
+          forceStopTimerFlg={false}
           handleTimerUpdate={() => {}}
           handleDeleteTask={() => {}}
           handleOnBlur={() => {}}

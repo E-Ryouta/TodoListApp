@@ -1,4 +1,4 @@
-import { Box, Heading, VStack } from "@chakra-ui/react";
+import { Heading, VStack } from "@chakra-ui/react";
 import { SideBarButton } from "./SideBarButton";
 import { FcTodoList } from "react-icons/fc";
 

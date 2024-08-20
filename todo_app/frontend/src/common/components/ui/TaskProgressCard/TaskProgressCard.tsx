@@ -10,7 +10,7 @@ type TaskProgressCardProps = {
 
 export function TaskProgressCard({ ...props }: TaskProgressCardProps) {
   return (
-    <Card w={"500px"} borderRadius={30} bg={"tertiary"}>
+    <Card borderRadius={30} bg={"tertiary"}>
       <Text textAlign={"center"} fontWeight={"bold"} fontSize={"xl"}>
         {props.progressHeader}
       </Text>

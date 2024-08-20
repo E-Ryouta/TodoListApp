@@ -1,21 +1,26 @@
 import { HStack, VStack, Text, IconButton, Box } from "@chakra-ui/react";
 import { MdOutlineNotStarted, MdOutlineStopCircle } from "react-icons/md";
 import { IoReloadCircle } from "react-icons/io5";
-import { useBoolean } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
+import "./timerAnimation.css";
 
 type TimerProps = {
+  isStart: boolean;
   defaultTime: number;
   startClickApproveFlg: boolean;
+  animateTimerIcon: boolean;
   updateTimerSettings: (time: number) => void;
+  resetTimerSettings: () => void;
 };
 
 export function Timer({
+  isStart,
   defaultTime,
   startClickApproveFlg,
+  animateTimerIcon,
   updateTimerSettings,
+  resetTimerSettings,
 }: TimerProps) {
-  const [isStart, setIsStart] = useBoolean();
   const [time, setTime] = useState(defaultTime);
 
   useEffect(() => {
@@ -28,25 +33,17 @@ export function Timer({
     return () => clearInterval(timer);
   }, [isStart]);
 
-  const handleIconClick = () => {
-    if (isStart) {
-      updateTimerSettings(time);
-    }
-    setIsStart.toggle();
-  };
-
-  const handleResetClick = () => {
-    setTime(0);
-    updateTimerSettings(0);
-    setIsStart.off();
-  };
-
   const formatTime = (time: number) => {
     const getSeconds = `0${time % 60}`.slice(-2);
     const minutes: any = `${Math.floor(time / 60)}`;
     const getMinutes = `0${minutes % 60}`.slice(-2);
     const getHours = `0${Math.floor(time / 3600)}`.slice(-2);
     return `${getHours}:${getMinutes}:${getSeconds}`;
+  };
+
+  const handleResetClick = () => {
+    setTime(0);
+    resetTimerSettings();
   };
 
   return (
@@ -70,13 +67,14 @@ export function Timer({
           ml={"1rem"}
           aria-label="StartAndStopButton"
           variant={"ghost"}
-          onClick={handleIconClick}
+          onClick={() => updateTimerSettings(time)}
           isDisabled={startClickApproveFlg}
+          className={animateTimerIcon ? "anim-box poyopoyo" : ""}
           icon={
             isStart ? (
-              <MdOutlineStopCircle size={"lg"} />
+              <MdOutlineStopCircle size={"2.5rem"} />
             ) : (
-              <MdOutlineNotStarted size={"lg"} />
+              <MdOutlineNotStarted size={"2.5rem"} />
             )
           }
         />
@@ -85,7 +83,7 @@ export function Timer({
           variant={"ghost"}
           onClick={handleResetClick}
           isDisabled={startClickApproveFlg}
-          icon={<IoReloadCircle size={"lg"} fontStyle={"bold"} />}
+          icon={<IoReloadCircle size={"2.5rem"} fontStyle={"bold"} />}
         />
       </HStack>
     </Box>
