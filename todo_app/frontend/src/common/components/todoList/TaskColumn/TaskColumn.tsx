@@ -21,6 +21,13 @@ type TaskColumnProps = {
   ) => void;
 };
 
+export type ModalParams = {
+  onClose: (value: {
+    ok: boolean;
+    data: { taskTitle: string; timer: number };
+  }) => void;
+};
+
 export const TaskColumn = React.memo(function TaskColumn({
   date,
   tasks,
@@ -28,6 +35,7 @@ export const TaskColumn = React.memo(function TaskColumn({
   handleUpdateTodoState,
 }: TaskColumnProps) {
   const [containerState, setContainerState] = useState<TaskCardProps[]>(tasks);
+  const [modalOpen, setModalOpen] = useState<ModalParams | null>(null);
 
   useEffect(() => {
     setContainerState(tasks);
@@ -40,22 +48,53 @@ export const TaskColumn = React.memo(function TaskColumn({
 
   const handleAddTask = useCallback(async () => {
     const new_id = uuid4v() as UUID;
-    await putTasks({
-      task_id: new_id,
-      task_container_id: containerId,
-      task_title: "",
-      task_description: "",
-      created_at: date,
-    });
-    setContainerState((prev) => [
-      ...prev,
-      {
-        id: new_id,
-        taskTitle: "",
-        taskDescription: "",
-        timer: 0,
-      },
-    ]);
+
+    if (containerId === "done") {
+      const res = await new Promise<{
+        ok: boolean;
+        data: { taskTitle: string; timer: number };
+      }>((resolve) => {
+        setModalOpen({ onClose: resolve });
+      });
+      setModalOpen(null);
+      if (res.ok) {
+        await putTasks({
+          task_id: new_id,
+          task_container_id: containerId,
+          task_title: res.data.taskTitle,
+          task_description: "",
+          task_timer: res.data.timer,
+          created_at: date,
+        });
+        setContainerState((prev) => [
+          ...prev,
+          {
+            id: new_id,
+            taskTitle: res.data.taskTitle,
+            taskDescription: "",
+            timer: res.data.timer,
+          },
+        ]);
+      }
+    } else {
+      await putTasks({
+        task_id: new_id,
+        task_container_id: containerId,
+        task_title: "",
+        task_description: "",
+        task_timer: 0,
+        created_at: date,
+      });
+      setContainerState((prev) => [
+        ...prev,
+        {
+          id: new_id,
+          taskTitle: "",
+          taskDescription: "",
+          timer: 0,
+        },
+      ]);
+    }
   }, [containerId, date]);
 
   const handleDeleteTask = useCallback(async (taskId: string) => {
@@ -103,6 +142,7 @@ export const TaskColumn = React.memo(function TaskColumn({
     <DroppableContainer key={containerId} id={containerId} items={tasks}>
       <TaskProgressCard
         id={containerId}
+        modalOpen={modalOpen}
         progressHeader={containerId}
         handleAddTask={handleAddTask}
       >
@@ -116,7 +156,6 @@ export const TaskColumn = React.memo(function TaskColumn({
                     id={task.id as UUID}
                     addTimerFlag={containerId !== "todo"}
                     startClickApproveFlg={containerId !== "inProgress"}
-                    forceStopTimerFlg={containerId !== "doing"}
                     handleOnBlur={handleOnBlur}
                     handleTimerUpdate={handleTimerUpdate}
                     handleDeleteTask={handleDeleteTask}

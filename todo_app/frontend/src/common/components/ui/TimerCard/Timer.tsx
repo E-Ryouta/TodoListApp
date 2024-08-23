@@ -34,6 +34,7 @@ export function Timer({
   }, [isStart]);
 
   const formatTime = (time: number) => {
+    console.log(time);
     const getSeconds = `0${time % 60}`.slice(-2);
     const minutes: any = `${Math.floor(time / 60)}`;
     const getMinutes = `0${minutes % 60}`.slice(-2);
@@ -48,7 +49,7 @@ export function Timer({
 
   return (
     <Box>
-      <HStack w={"100%"} justifyContent={"center"}>
+      <HStack w={"100%"} justifyContent={"center"} px={"2rem"}>
         <VStack gap={0}>
           <Text fontSize={"2xl"}>{formatTime(time).split(":")[0]}</Text>
           <Text>Hours</Text>

@@ -26,6 +26,7 @@ class DataAccess:
                     task_container_id=task["task_container_id"], 
                     task_title=task["task_title"], 
                     task_description=task["task_description"], 
+                    task_timer=task["task_timer"],
                     created_at=task["created_at"]))
 
             session.commit()

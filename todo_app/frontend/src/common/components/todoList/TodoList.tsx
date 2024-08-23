@@ -177,7 +177,6 @@ export function TodoList({ date }: TodoListProps) {
           task={activeTask}
           addTimerFlag={false}
           startClickApproveFlg={false}
-          forceStopTimerFlg={false}
           handleTimerUpdate={() => {}}
           handleDeleteTask={() => {}}
           handleOnBlur={() => {}}

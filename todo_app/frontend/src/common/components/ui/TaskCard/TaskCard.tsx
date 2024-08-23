@@ -10,17 +10,17 @@ import {
   Flex,
   Box,
   FormControl,
+  Tooltip,
 } from "@chakra-ui/react";
 import {
   MdOutlineDescription,
   MdDragIndicator,
   MdDeleteOutline,
 } from "react-icons/md";
-import { useContext, useMemo, useRef, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { DraggableContext } from "../DraggableContainer/DraggableContext";
 import { Timer } from "../TimerCard";
 import type { UUID } from "crypto";
-import React from "react";
 
 export type TaskCardProps = {
   id: UUID;
@@ -34,7 +34,6 @@ type TaskCardPropsWithSetters = {
   task: TaskCardProps;
   addTimerFlag: boolean;
   startClickApproveFlg: boolean;
-  forceStopTimerFlg: boolean;
   handleDeleteTask: (taskId: string) => void;
   handleTimerUpdate: (taskId: string, task: TaskCardProps) => void;
   handleOnBlur: (taskId: string, task: TaskCardProps) => void;
@@ -45,7 +44,6 @@ export function TaskCard({
   task,
   addTimerFlag,
   startClickApproveFlg,
-  forceStopTimerFlg,
   handleDeleteTask,
   handleTimerUpdate,
   handleOnBlur,
@@ -101,29 +99,33 @@ export function TaskCard({
               variant={"ghost"}
               aria-label={"drag"}
               icon={<MdDragIndicator />}
-              onClick={handleAnimateTimerIcon}
+              onMouseDown={handleAnimateTimerIcon}
               {...(!isStart && draggableContext?.attributes)}
               {...(!isStart && draggableContext?.listeners)}
             />
-            <Input
-              ml={4}
-              variant={"unstyled"}
-              value={taskTitle}
-              ref={inputTitleRef}
-              onBlur={() => handleOnBlur(id, { ...task, taskTitle })}
-              onChange={(e) => setTaskTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  inputTitleRef.current?.blur();
-                }
-              }}
-            />
-            <IconButton
-              variant={"ghost"}
-              aria-label="add description"
-              icon={<MdOutlineDescription />}
-              onClick={setAddDescriptionFlag.toggle}
-            />
+            <Tooltip label={taskTitle} placement={"top"}>
+              <Input
+                ml={4}
+                variant={"unstyled"}
+                value={taskTitle}
+                ref={inputTitleRef}
+                onBlur={() => handleOnBlur(id, { ...task, taskTitle })}
+                onChange={(e) => setTaskTitle(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    inputTitleRef.current?.blur();
+                  }
+                }}
+              />
+            </Tooltip>
+            <Tooltip label={"詳細を記載する"} placement={"top"}>
+              <IconButton
+                variant={"ghost"}
+                aria-label="add description"
+                icon={<MdOutlineDescription />}
+                onClick={setAddDescriptionFlag.toggle}
+              />
+            </Tooltip>
             <IconButton
               variant={"ghost"}
               aria-label="delete"
