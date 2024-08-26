@@ -34,7 +34,6 @@ export function Timer({
   }, [isStart]);
 
   const formatTime = (time: number) => {
-    console.log(time);
     const getSeconds = `0${time % 60}`.slice(-2);
     const minutes: any = `${Math.floor(time / 60)}`;
     const getMinutes = `0${minutes % 60}`.slice(-2);
