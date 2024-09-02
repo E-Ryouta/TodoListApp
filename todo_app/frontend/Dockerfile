@@ -1,22 +1,25 @@
 FROM node:20.0.0 AS base
+ENV TZ="Asia/Tokyo"
 WORKDIR /app
+RUN npm install -g pnpm
 COPY package.json ./
-COPY yarn.lock ./
+COPY pnpm-lock.yaml ./
 
 ARG BACKEND_ORIGIN_CLIENT
 ENV REACT_APP_BACKEND_ORIGIN_CLIENT=${BACKEND_ORIGIN_CLIENT}
 
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
+
 
 FROM base AS build
 ENV PORT=80
 COPY . /app
-RUN yarn build
+RUN pnpm build
 RUN echo "#!/bin/sh" > /entrypoint.sh \
  && echo "echo \"nameserver 172.16.0.51\" > /etc/resolv.conf" > /entrypoint.sh \
  && echo "echo \"nameserver 127.0.0.11\" >> /etc/resolv.conf" >> /entrypoint.sh \
  && echo "" >> /entrypoint.sh \
- && echo "yarn start --port 80 --hostname 0.0.0.0" >> /entrypoint.sh
+ && echo "pnpm start --port 80 --hostname 0.0.0.0" >> /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 EXPOSE 80
 ENTRYPOINT /entrypoint.sh

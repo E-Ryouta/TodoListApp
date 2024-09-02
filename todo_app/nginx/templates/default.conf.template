@@ -23,6 +23,7 @@ server {
     }
 
     location / {
-        proxy_pass http://frontend;
+        proxy_pass http://frontend:80;
     }
+
 }
