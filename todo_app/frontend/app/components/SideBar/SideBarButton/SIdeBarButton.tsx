@@ -1,21 +1,29 @@
 import { Button } from "@chakra-ui/react";
+import { Link } from "@remix-run/react";
 
 type SideBarButtonProps = {
   buttonTitle: string;
   leftIcon: JSX.Element;
+  navigateTo: string;
 };
 
-export function SideBarButton({ ...props }: SideBarButtonProps) {
+export function SideBarButton({
+  buttonTitle,
+  leftIcon,
+  navigateTo,
+}: SideBarButtonProps) {
   return (
-    <Button
-      leftIcon={props.leftIcon}
-      variant={"ghost"}
-      w={"100%"}
-      size={"lg"}
-      bg={"white"}
-      color={"secondary"}
-    >
-      {props.buttonTitle}
-    </Button>
+    <Link to={navigateTo}>
+      <Button
+        leftIcon={leftIcon}
+        variant={"ghost"}
+        w={"200px"}
+        size={"lg"}
+        bg={"white"}
+        color={"secondary"}
+      >
+        {buttonTitle}
+      </Button>
+    </Link>
   );
 }

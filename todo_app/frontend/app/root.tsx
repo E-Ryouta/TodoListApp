@@ -15,6 +15,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLocation,
 } from "@remix-run/react";
 import { MetaFunction, LinksFunction } from "@remix-run/node";
 import { ServerStyleContext, ClientStyleContext } from "./context";
