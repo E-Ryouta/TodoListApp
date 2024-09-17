@@ -1,15 +1,16 @@
 import uuid
-from datetime import datetime, date, time
+from datetime import datetime
+from sqlalchemy import inspect
 
-def model_to_obj(model): 
+def object_as_dict(model):
     dict_obj = {}
-    for column in model.__table__.columns:
-        value = getattr(model, column.name)
+    for column in inspect(model).mapper.column_attrs:
+        value = getattr(model, column.key)
         match value:
-            case datetime():
-                dict_obj[column.name] = value.strftime("%Y-%m-%d %H:%M:%S")
-            case uuid.UUID():
-                dict_obj[column.name] = str(value)
-            case _:
-                dict_obj[column.name] = value
+            case datetime():  # datetime 型の場合
+                dict_obj[column.key] = value.strftime("%Y-%m-%d %H:%M:%S")
+            case uuid.UUID():  # UUID 型の場合
+                dict_obj[column.key] = str(value)
+            case _:  # それ以外の型
+                dict_obj[column.key] = value
     return dict_obj

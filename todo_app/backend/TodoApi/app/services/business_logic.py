@@ -5,8 +5,11 @@ class TodoListService:
     def __init__(self):
         self.data_access = DataAccess()
 
-    def get_todo_list(self, created_at):
-        return self.data_access.get_date_todo_list(created_at)
+    def get_tasks(self, created_at):
+        return self.data_access.get_tasks(created_at)
+    
+    def get_tags(self):
+        return self.data_access.get_tags()
     
     def update_task(self, task):
         return self.data_access.update_task(task)

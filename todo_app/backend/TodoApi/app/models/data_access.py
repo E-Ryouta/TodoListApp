@@ -1,19 +1,27 @@
-from .schema.models import Tasks
+from .schema.models import Tasks, Tags
 from .session_manager.session_manager import SessionManager
 from sqlalchemy.orm import aliased
 from sqlalchemy import cast, Date
 
 
 class DataAccess:
-    def get_date_todo_list(self, created_at):
+    def get_tasks(self, created_at):
         with SessionManager() as session:
-            todo_list = (
-                session.query(Tasks)
+            tasks = (
+                session.query(Tasks, Tags)
+                .select_from(Tasks)
+                .join(Tags, Tasks.tag_id == Tags.tag_id)
                 .filter(cast(Tasks.created_at, Date) == created_at)
                 .all()
             )
         
-        return todo_list
+        return tasks
+    
+    def get_tags(self):
+        with SessionManager() as session:
+            tags = session.query(Tags).all()
+        
+        return tags
     
     def update_task(self, task):
         with SessionManager() as session:

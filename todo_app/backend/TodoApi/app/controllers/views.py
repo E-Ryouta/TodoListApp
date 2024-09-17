@@ -1,17 +1,17 @@
 from flask import Blueprint, jsonify
 from ..services.business_logic import TodoListService
-from ..utils.utils import model_to_obj
+from ..utils.utils import object_as_dict
 from flask import request
 from collections import OrderedDict
 
 todo_list_service = TodoListService()
 bp = Blueprint("todo_list", __name__)
 
-@bp.route("/todo_lists", methods=["GET"])
-def get_todo_list():
+@bp.route("/tasks", methods=["GET"])
+def get_tasks():
     created_at = request.args.get("created_at")
-    todo_list = todo_list_service.get_todo_list(created_at)
-
+    tasks = todo_list_service.get_tasks(created_at)
+            
     todo_list_obj = OrderedDict(
         {
             "todo": [],
@@ -19,14 +19,24 @@ def get_todo_list():
             "done": [],
         }
     )
-    for tasks in todo_list:
-        task_obj = model_to_obj(tasks)
 
-        if (task_obj["task_container_id"] in todo_list_obj):
-            todo_list_obj[task_obj["task_container_id"]].append(task_obj)
+    for task, tag in tasks:
+        task_dict = object_as_dict(task)
+        tag_dict = object_as_dict(tag)
+        task_and_tag_dict = {**task_dict, **tag_dict}
+
+        if (task_and_tag_dict["task_container_id"] in todo_list_obj):
+            todo_list_obj[task_and_tag_dict["task_container_id"]].append(task_and_tag_dict)
 
     return jsonify(todo_list_obj).json
 
+@bp.route("/tags", methods=["GET"])
+def get_tags():
+    tags = todo_list_service.get_tags()
+
+    tags_dict = [object_as_dict(tag) for tag in tags]
+
+    return jsonify(tags_dict).json
 
 @bp.route("/tasks", methods=["PUT"])
 def put_task():
