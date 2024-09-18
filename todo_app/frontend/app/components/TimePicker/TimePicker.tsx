@@ -28,9 +28,7 @@ export function TimePicker({ updateTimerSettings }: TimePickerProps) {
   };
 
   useEffect(() => {
-    console.log(time.Hour);
     const timeToSeconds = time.Hour * 3600 + time.Minute * 60 + time.Second;
-    console.log(timeToSeconds);
     updateTimerSettings(timeToSeconds);
   }, [time]);
 

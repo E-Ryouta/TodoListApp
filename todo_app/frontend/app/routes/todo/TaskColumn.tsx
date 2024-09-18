@@ -9,13 +9,12 @@ import { UUID } from "crypto";
 import { v4 as uuid4v } from "uuid";
 import { putTasks } from "app/endpoints";
 import { fetchDelete } from "app/lib/fetch";
-import React from "react";
 
 type TaskColumnProps = {
   date: string;
   tasks: TaskCardProps[];
   containerId: string;
-  handleUpdateTodoState: (
+  onChangeTodoState: (
     containerId: string,
     updatedTasks: TaskCardProps[]
   ) => void;
@@ -28,23 +27,30 @@ export type ModalParams = {
   }) => void;
 };
 
-export const TaskColumn = React.memo(function TaskColumn({
+export const TaskColumn = function TaskColumn({
   date,
   tasks,
   containerId,
-  handleUpdateTodoState,
+  onChangeTodoState,
 }: TaskColumnProps) {
-  const [containerState, setContainerState] = useState<TaskCardProps[]>(tasks);
   const [modalOpen, setModalOpen] = useState<ModalParams | null>(null);
 
-  useEffect(() => {
-    setContainerState(tasks);
-  }, [tasks]);
+  const onUpdateTodoStateNewTask = useCallback(
+    (task: TaskCardProps) => {
+      onChangeTodoState(
+        containerId,
+        tasks.map((t) => (t.id === task.id ? task : t))
+      );
+    },
+    [tasks]
+  );
 
-  useEffect(() => {
-    handleUpdateTodoState(containerId, containerState);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [containerState]);
+  const onAddTodoStateNewTask = useCallback(
+    (task: TaskCardProps) => {
+      onChangeTodoState(containerId, [...tasks, task]);
+    },
+    [tasks]
+  );
 
   const handleAddTask = useCallback(async () => {
     const new_id = uuid4v() as UUID;
@@ -60,82 +66,67 @@ export const TaskColumn = React.memo(function TaskColumn({
       if (res.ok) {
         await putTasks({
           task_id: new_id,
+          tag_id: null,
           task_container_id: containerId,
           task_title: res.data.taskTitle,
           task_description: "",
           task_timer: res.data.timer,
           created_at: date,
         });
-        setContainerState((prev) => [
-          ...prev,
-          {
-            id: new_id,
-            taskTitle: res.data.taskTitle,
-            taskDescription: "",
-            timer: res.data.timer,
-          },
-        ]);
+        onAddTodoStateNewTask({
+          id: new_id,
+          taskTitle: res.data.taskTitle,
+          taskDescription: "",
+          timer: res.data.timer,
+          tag_id: "" as UUID,
+        });
       }
     } else {
       await putTasks({
         task_id: new_id,
+        tag_id: null,
         task_container_id: containerId,
         task_title: "",
         task_description: "",
         task_timer: 0,
         created_at: date,
       });
-      setContainerState((prev) => [
-        ...prev,
-        {
-          id: new_id,
-          taskTitle: "",
-          taskDescription: "",
-          timer: 0,
-        },
-      ]);
-    }
-  }, [containerId, date]);
-
-  const handleDeleteTask = useCallback(async (taskId: string) => {
-    await fetchDelete("/api/tasks", { task_id: taskId });
-    setContainerState((prev) => prev.filter((task) => task.id !== taskId));
-  }, []);
-
-  const handleOnBlur = useCallback(
-    async (taskId: string, task: TaskCardProps) => {
-      await putTasks({
-        task_id: taskId,
-        task_container_id: containerId,
-        task_title: task.taskTitle,
-        task_description: task.taskDescription,
-        task_timer: task.timer,
-        created_at: date,
+      console.log("流れてる");
+      onAddTodoStateNewTask({
+        id: new_id,
+        taskTitle: "",
+        taskDescription: "",
+        timer: 0,
+        tag_id: "" as UUID,
       });
+    }
+  }, [containerId, date, onAddTodoStateNewTask]);
 
-      setContainerState((prev) =>
-        prev.map((t) => (t.id === taskId ? task : t))
+  const handleDeleteTask = useCallback(
+    async (taskId: string) => {
+      await fetchDelete("/api/tasks", { task_id: taskId });
+      onChangeTodoState(
+        containerId,
+        tasks.filter((task) => task.id !== taskId)
       );
     },
-    [containerId, date]
+    [onChangeTodoState]
   );
 
-  const handleTimerUpdate = useCallback(
+  const handleUpdateTask = useCallback(
     async (taskId: string, task: TaskCardProps) => {
       await putTasks({
         task_id: taskId,
+        tag_id: task.tag_id,
         task_container_id: containerId,
         task_title: task.taskTitle,
         task_description: task.taskDescription,
         task_timer: task.timer,
         created_at: date,
       });
-
-      setContainerState((prev) =>
-        prev.map((t) => (t.id === taskId ? task : t))
-      );
+      onUpdateTodoStateNewTask(task);
     },
-    [containerId, date]
+    [containerId, date, onUpdateTodoStateNewTask]
   );
 
   return (
@@ -156,8 +147,8 @@ export const TaskColumn = React.memo(function TaskColumn({
                     id={task.id as UUID}
                     addTimerFlag={containerId !== "todo"}
                     startClickApproveFlg={containerId !== "inProgress"}
-                    handleOnBlur={handleOnBlur}
-                    handleTimerUpdate={handleTimerUpdate}
+                    handleTodoUpdate={onUpdateTodoStateNewTask}
+                    handleUpdateTask={handleUpdateTask}
                     handleDeleteTask={handleDeleteTask}
                   />
                 </Box>
@@ -168,4 +159,4 @@ export const TaskColumn = React.memo(function TaskColumn({
       </TaskProgressCard>
     </DroppableContainer>
   );
-});
+};

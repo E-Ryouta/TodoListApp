@@ -19,14 +19,13 @@ def get_tasks():
             "done": [],
         }
     )
+    
+    tasks_dict = [object_as_dict(task) for task in tasks]
 
-    for task, tag in tasks:
-        task_dict = object_as_dict(task)
-        tag_dict = object_as_dict(tag)
-        task_and_tag_dict = {**task_dict, **tag_dict}
+    for task in tasks_dict:
 
-        if (task_and_tag_dict["task_container_id"] in todo_list_obj):
-            todo_list_obj[task_and_tag_dict["task_container_id"]].append(task_and_tag_dict)
+        if (task["task_container_id"] in todo_list_obj):
+            todo_list_obj[task["task_container_id"]].append(task)
 
     return jsonify(todo_list_obj).json
 

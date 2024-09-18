@@ -8,9 +8,7 @@ class DataAccess:
     def get_tasks(self, created_at):
         with SessionManager() as session:
             tasks = (
-                session.query(Tasks, Tags)
-                .select_from(Tasks)
-                .join(Tags, Tasks.tag_id == Tags.tag_id)
+                session.query(Tasks)
                 .filter(cast(Tasks.created_at, Date) == created_at)
                 .all()
             )
@@ -35,6 +33,7 @@ class DataAccess:
                     task_title=task["task_title"], 
                     task_description=task["task_description"], 
                     task_timer=task["task_timer"],
+                    tag_id=task["tag_id"],
                     created_at=task["created_at"]))
 
             session.commit()

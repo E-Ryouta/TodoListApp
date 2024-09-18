@@ -2,20 +2,21 @@ import { Tag, TagLabel, TagRightIcon, Button, Tooltip } from "@chakra-ui/react";
 import { MdChangeCircle } from "react-icons/md";
 import { SelectTagPopOver } from "./SelectTagPopOver";
 import { SelectTagProps } from "./SelectTagPopOver";
-import { useState } from "react";
+import { UUID } from "crypto";
+
+type TaskKindTagProps = {
+  tag_id: UUID;
+  tagList: SelectTagProps[];
+  handleUpdateTag: (tag_id: UUID) => void;
+};
 
 export function TaskKindTag({
-  tagLabel,
-  color,
+  tag_id,
   tagList,
-}: SelectTagProps & { tagList: SelectTagProps[] }) {
-  const [selectedTag, setSelectedTag] = useState<SelectTagProps>({
-    tagLabel: tagLabel,
-    color: color,
-  });
-
-  const handleSelectTag = (tag: SelectTagProps) => {
-    setSelectedTag(tag);
+  handleUpdateTag,
+}: TaskKindTagProps) {
+  const handleSelectTag = (tag_id: UUID) => {
+    handleUpdateTag(tag_id);
   };
 
   return (
@@ -25,11 +26,14 @@ export function TaskKindTag({
           <Tag
             size={"lg"}
             variant={"subtle"}
-            colorScheme={selectedTag?.color}
+            colorScheme={
+              tagList.find((tag) => tag.tag_id === tag_id)?.color || "gray"
+            }
             borderBottomRadius={0}
-            height={"100%"}
           >
-            <TagLabel w={"50px"}>{selectedTag?.tagLabel}</TagLabel>
+            <TagLabel w={"50px"}>
+              {tagList.find((tag) => tag.tag_id === tag_id)?.tagLabel || "None"}
+            </TagLabel>
             <TagRightIcon boxSize={"20px"}>
               <MdChangeCircle size={"lg"} />
             </TagRightIcon>

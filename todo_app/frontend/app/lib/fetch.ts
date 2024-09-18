@@ -3,10 +3,10 @@
 // Getリクエストを送る関数
 export const fetchGet = async (
   endpoint: string,
-  queryObj: { [key: string]: string }
+  queryObj?: { [key: string]: string }
 ) => {
   const url = getUrl(endpoint);
-  const query = objectToQuery(queryObj);
+  const query = queryObj ? objectToQuery(queryObj) : "";
   const response = await fetch(`${url}${query}`, {
     method: "GET",
     headers: { "Content-Type": "application/json" },
