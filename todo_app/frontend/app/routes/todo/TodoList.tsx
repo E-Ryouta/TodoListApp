@@ -14,6 +14,7 @@ import { UUID } from "crypto";
 import { arrayMove } from "@dnd-kit/sortable";
 import { TaskColumn } from "./TaskColumn";
 import { getTodoList, putTasks } from "app/endpoints";
+import { LineChart } from "@/components/LineChart";
 
 /**
  * TODO:todoStateを管理するhooksを作りたい

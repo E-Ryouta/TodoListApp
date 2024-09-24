@@ -7,8 +7,12 @@ export const theme = extendTheme({
     tertiary: "#FBF9F1",
   },
   styles: {
+    breakpoints: {
+      "2xl": "96em",
+    },
     global: {
       body: {
+        overflow: "hidden",
         bg: "transparent",
         _before: {
           content: '""',
