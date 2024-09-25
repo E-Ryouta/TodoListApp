@@ -91,7 +91,6 @@ export const TaskColumn = function TaskColumn({
         task_timer: 0,
         created_at: date,
       });
-      console.log("流れてる");
       onAddTodoStateNewTask({
         id: new_id,
         taskTitle: "",

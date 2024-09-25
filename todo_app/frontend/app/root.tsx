@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { withEmotionCache } from "@emotion/react";
 import {
   Box,
@@ -15,13 +15,11 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLocation,
 } from "@remix-run/react";
 import { MetaFunction, LinksFunction } from "@remix-run/node";
 import { ServerStyleContext, ClientStyleContext } from "./context";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import { NavBar } from "@/components/NavBar";
-import { DateBar } from "@/components/DateBar";
 import { SideBar } from "@/components/SideBar/SideBar";
 import { theme } from "./theme";
 
@@ -89,7 +87,6 @@ const Document = withEmotionCache(
 
 export default function App() {
   const [isOpen, setIsOpen] = useBoolean();
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
 
   return (
     <Document>
@@ -100,43 +97,23 @@ export default function App() {
           </Box>
           <Box w={"100%"} h={"100%"}>
             <HStack h={"100%"} gap={0}>
-              {isOpen && (
-                <Box h={"100%"} zIndex={2}>
-                  <SideBar />
-                </Box>
-              )}
-              <VStack w={"100%"} h={"100%"} overflow={"hidden"}>
-                <Box
-                  display={"flex"}
-                  justifyContent={"center"}
-                  w={"100%"}
-                  bg={"tertiary"}
-                  zIndex={1}
-                >
-                  <DateBar date={date} setDate={setDate} />
-                </Box>
-                <HStack h={"100%"} w={"100%"} pl={2}>
-                  <IconButton
-                    aria-label="SideBarToggle"
-                    borderRadius={50}
-                    size={"lg"}
-                    bg={"white"}
-                    icon={
-                      isOpen ? <IoIosArrowDropleft /> : <IoIosArrowDropright />
-                    }
-                    onClick={() => setIsOpen.toggle()}
-                  />
-                  <Box
-                    h={"100%"}
-                    w={"100%"}
-                    display={"flex"}
-                    alignItems={"flex-start"}
-                    overflowX={"auto"}
-                  >
-                    <Outlet context={date} />
-                  </Box>
-                </HStack>
-              </VStack>
+              <Box h={"100%"} zIndex={2} position={"relative"}>
+                {isOpen && <SideBar />}
+                <IconButton
+                  aria-label="SideBarToggle"
+                  borderRadius={50}
+                  size={"lg"}
+                  bg={"white"}
+                  position={"absolute"}
+                  right={"-56px"}
+                  top={"50%"}
+                  icon={
+                    isOpen ? <IoIosArrowDropleft /> : <IoIosArrowDropright />
+                  }
+                  onClick={() => setIsOpen.toggle()}
+                />
+              </Box>
+              <Outlet />
             </HStack>
           </Box>
         </VStack>
