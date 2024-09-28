@@ -21,6 +21,18 @@ class DataAccess:
         
         return tags
     
+    def get_tasks_with_tag(self, startDate, endDate):
+        with SessionManager() as session:
+            tasks_with_tag = (
+                session.query(Tasks, Tags)
+                .join(Tags, Tasks.tag_id == Tags.tag_id)
+                .filter(cast(Tasks.created_at, Date) >= startDate)
+                .filter(cast(Tasks.created_at, Date) <= endDate)
+                .all()
+            )
+        
+        return tasks_with_tag
+    
     def update_task(self, task):
         with SessionManager() as session:
             query = session.query(Tasks).filter(Tasks.task_id == task["task_id"])

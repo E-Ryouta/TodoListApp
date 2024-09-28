@@ -7,10 +7,10 @@ def object_as_dict(model):
     for column in inspect(model).mapper.column_attrs:
         value = getattr(model, column.key)
         match value:
-            case datetime():  # datetime 型の場合
+            case datetime():
                 dict_obj[column.key] = value.strftime("%Y-%m-%d %H:%M:%S")
-            case uuid.UUID():  # UUID 型の場合
+            case uuid.UUID():
                 dict_obj[column.key] = str(value)
-            case _:  # それ以外の型
+            case _: 
                 dict_obj[column.key] = value
     return dict_obj

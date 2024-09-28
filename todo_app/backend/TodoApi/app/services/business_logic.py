@@ -11,6 +11,9 @@ class TodoListService:
     def get_tags(self):
         return self.data_access.get_tags()
     
+    def get_tasks_with_tag(self, startDate, endDate):
+        return self.data_access.get_tasks_with_tag(startDate, endDate)
+
     def update_task(self, task):
         return self.data_access.update_task(task)
     
