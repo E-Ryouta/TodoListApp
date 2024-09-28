@@ -1,6 +1,5 @@
 from .schema.models import Tasks, Tags
 from .session_manager.session_manager import SessionManager
-from sqlalchemy.orm import aliased
 from sqlalchemy import cast, Date, func
 
 

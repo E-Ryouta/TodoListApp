@@ -1,10 +1,10 @@
 // fetch用の共通関数
 
 // Getリクエストを送る関数
-export const fetchGet = async (
+export const fetchGet = async <T = any>(
   endpoint: string,
   queryObj?: { [key: string]: string }
-) => {
+): Promise<T> => {
   const url = getUrl(endpoint);
   const query = queryObj ? objectToQuery(queryObj) : "";
   const response = await fetch(`${url}${query}`, {

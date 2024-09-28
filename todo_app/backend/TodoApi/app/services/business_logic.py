@@ -1,4 +1,4 @@
-from TodoApi.app.utils.utils import object_as_dict
+from ..utils.utils import object_as_dict
 from ..models.data_access import DataAccess
 
 

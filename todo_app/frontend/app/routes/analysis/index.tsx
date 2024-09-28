@@ -1,37 +1,24 @@
 import { Analysis } from "./Analysis";
 import { Box, VStack } from "@chakra-ui/react";
 import { AnalysisDateBar } from "@/components/AnalysisDataBar";
-import { useState } from "react";
+import { useLoaderData } from "@remix-run/react";
+import { analysisLoader } from "./Analysis.loader";
+import { useAnalysis } from "./Analysis.hook";
 
-function getWeekStartAndEndDates() {
-  const today = new Date();
-  const dayOfWeek = today.getDay();
-
-  const monday = new Date(today);
-  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 2));
-
-  const sunday = new Date(monday);
-  sunday.setDate(monday.getDate() + 6);
-
-  return {
-    startDate: monday.toISOString().split("T")[0],
-    endDate: sunday.toISOString().split("T")[0],
-  };
-}
+export const loader = analysisLoader;
 
 export default function App() {
-  const { startDate: initialStartDate, endDate: initialEndDate } =
-    getWeekStartAndEndDates();
-  const [startDate, setStartDate] = useState(initialStartDate);
-  const [endDate, setEndDate] = useState(initialEndDate);
+  const { startDate, endDate, handleChangeStartDate, handleChangeEndDate } =
+    useAnalysis();
+  const tasksWithTag = useLoaderData<typeof loader>();
 
   return (
     <VStack w={"100%"} h={"100%"} overflow={"hidden"}>
       <AnalysisDateBar
         startDate={startDate}
         endDate={endDate}
-        handleStartDate={setStartDate}
-        handleEndDate={setEndDate}
+        handleStartDate={handleChangeStartDate}
+        handleEndDate={handleChangeEndDate}
       />
       <Box
         h={"100%"}
@@ -41,7 +28,11 @@ export default function App() {
         overflowX={"auto"}
         pl={"60px"}
       >
-        <Analysis />
+        <Analysis
+          tasksWithTag={tasksWithTag}
+          startDate={startDate}
+          endDate={endDate}
+        />
       </Box>
     </VStack>
   );

@@ -2,86 +2,51 @@ import { LineChart } from "@/components/LineChart";
 import { Box, HStack, VStack } from "@chakra-ui/react";
 import { PieChart } from "@/components/PieChart";
 import { Table } from "@/components/Table";
+import type { getTasksWithTagResponse } from "./_endpoints/getAnalysisTasks";
+import { generateLineChartData } from "./Analysis.lib";
 
-export function Analysis() {
+type AnalysisProps = {
+  startDate: string;
+  endDate: string;
+  tasksWithTag: getTasksWithTagResponse;
+};
+
+export function Analysis({ tasksWithTag, startDate, endDate }: AnalysisProps) {
+  const lineChartData = generateLineChartData(
+    tasksWithTag.taskSumWithDate,
+    startDate,
+    endDate
+  );
+
+  const tableData = tasksWithTag.doingTodoTasks.map((task) => {
+    return {
+      taskTitle: task.taskTitle,
+      date: task.createdAt,
+    };
+  });
+
+  const pieChartData = tasksWithTag.averageTimePerTag.map((task) => {
+    return {
+      name: task.tagLabel,
+      value: parseFloat((task.averageDuration / 3600).toFixed(3)),
+      color: task.tagColor,
+    };
+  });
+
   return (
     <HStack w={"100%"} h={"100%"} justify={"space-around"}>
       <VStack w={"100%"} h={"100%"}>
         <Box w={"100%"} h={"50%"} mb={10}>
           <LineChart
             lineChartTitle={"完了タスク数の推移"}
-            data={[
-              {
-                日付: "2021-01-01",
-                タスク数: 1,
-              },
-              {
-                日付: "2021-01-02",
-                タスク数: 2,
-              },
-              {
-                日付: "2021-01-03",
-                タスク数: 3,
-              },
-              {
-                日付: "2021-01-04",
-                タスク数: 4,
-              },
-              {
-                日付: "2021-01-05",
-                タスク数: 5,
-              },
-            ]}
+            data={lineChartData}
           />
         </Box>
         <Box w={"90%"} maxH={{ base: "160px", "2xl": "300px" }}>
-          <Table
-            tableTitle={"未完了タスク一覧"}
-            data={[
-              {
-                taskTitle: "test1",
-                date: "2021-01-01",
-              },
-              {
-                taskTitle: "test2",
-                date: "2021-01-02",
-              },
-              {
-                taskTitle: "test3",
-                date: "2021-01-03",
-              },
-              {
-                taskTitle: "test4",
-                date: "2021-01-04",
-              },
-              {
-                taskTitle: "test5",
-                date: "2021-01-05",
-              },
-            ]}
-          />
+          <Table tableTitle={"未完了タスク一覧"} data={tableData} />
         </Box>
       </VStack>
-      <PieChart
-        pieChartTitle={"タスク種類別平均時間"}
-        data={[
-          {
-            name: "test",
-            value: 1,
-            color: "#AFD3E2",
-          },
-          {
-            name: "test",
-            value: 2,
-            color: "#146C94",
-          },
-          {
-            name: "test",
-            value: 3,
-            color: "#FBF9F1",
-          },
-        ]}
-      />
+      <PieChart pieChartTitle={"タスク種類別平均時間"} data={pieChartData} />
     </HStack>
   );
 }
