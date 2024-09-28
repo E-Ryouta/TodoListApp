@@ -13,7 +13,8 @@ services:
     ports:
       - 5432:5432
     networks:
-      - todo_app_network
+      todo_app_network:
+        ipv4_address: 172.18.0.2
 
   nginx:
     image: nginx
@@ -24,7 +25,8 @@ services:
     depends_on:
       - frontend
     networks:
-      - todo_app_network
+      todo_app_network:
+        ipv4_address: 172.18.0.5
 
   frontend:
     build:
@@ -34,9 +36,12 @@ services:
     ports:
       - 80:80
     networks:
-      - todo_app_network
+      todo_app_network:
+        ipv4_address: 172.18.0.10
     environment:
       - BACKEND_ORIGIN_CLIENT=${BACKEND_ORIGIN_CLIENT}
+    extra_hosts:
+      - "nginx:172.18.0.5"
 
   todo_api:
     build:
@@ -48,7 +53,8 @@ services:
     ports:
       - 5001:5001
     networks:
-      - todo_app_network
+      todo_app_network:
+        ipv4_address: 172.18.0.6
     depends_on:
       - db
     restart: unless-stopped
@@ -59,3 +65,6 @@ volumes:
 networks:
   todo_app_network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
