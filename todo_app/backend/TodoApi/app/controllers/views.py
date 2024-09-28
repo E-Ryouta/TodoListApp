@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 from ..services.business_logic import TodoListService
-from ..utils.utils import object_as_dict
+from ..utils.utils import object_as_dict, to_camel_case
 from flask import request
 from collections import OrderedDict
 
@@ -42,16 +42,10 @@ def get_tasks_with_tag():
     startDate = request.args.get("startDate")
     endDate = request.args.get("endDate")
 
-    tasks_with_tag_models = todo_list_service.get_tasks_with_tag(startDate, endDate)
+    tasks_with_tag_obj = todo_list_service.get_tasks_with_tag(startDate, endDate)
+    res_tasks_with_tag_obj =  to_camel_case(tasks_with_tag_obj)
 
-    task_with_tag_obj = []
-    for task, tag in tasks_with_tag_models:
-        task_dict = object_as_dict(task)
-        tag_dict = object_as_dict(tag)
-        task_with_tag_dict = {**task_dict, **tag_dict}
-        task_with_tag_obj.append(task_with_tag_dict)
-
-    return jsonify(task_with_tag_obj).json
+    return jsonify(res_tasks_with_tag_obj).json
 
 @bp.route("/tasks", methods=["PUT"])
 def put_task():
