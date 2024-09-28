@@ -1,7 +1,7 @@
 from .schema.models import Tasks, Tags
 from .session_manager.session_manager import SessionManager
 from sqlalchemy.orm import aliased
-from sqlalchemy import cast, Date
+from sqlalchemy import cast, Date, func
 
 
 class DataAccess:
@@ -23,15 +23,42 @@ class DataAccess:
     
     def get_tasks_with_tag(self, startDate, endDate):
         with SessionManager() as session:
-            tasks_with_tag = (
-                session.query(Tasks, Tags)
-                .join(Tags, Tasks.tag_id == Tags.tag_id)
+            task_sum_with_date = (
+                session.query(
+                    cast(Tasks.created_at, Date).label("date"),
+                    func.count(Tasks.task_id).label("total_tasks")
+                )
+                .filter(Tasks.task_container_id == "done")
+                .filter(cast(Tasks.created_at, Date) >= startDate)
+                .filter(cast(Tasks.created_at, Date) <= endDate)
+                .group_by(cast(Tasks.created_at, Date))
+                .order_by(cast(Tasks.created_at, Date))
+                .all()
+            )
+
+            doing_todo_tasks = (
+                session.query(Tasks)
+                .filter(Tasks.task_container_id.in_(["todo", "inProgress"]))
                 .filter(cast(Tasks.created_at, Date) >= startDate)
                 .filter(cast(Tasks.created_at, Date) <= endDate)
                 .all()
             )
+
+            average_time_per_tag = (
+                session.query(
+                    Tags.tag_label,
+                    Tags.tag_color,
+                    func.avg(Tasks.task_timer).label("average_duration")
+                )
+                .join(Tasks, Tasks.tag_id == Tags.tag_id)
+                .filter(cast(Tasks.created_at, Date) >= startDate)
+                .filter(cast(Tasks.created_at, Date) <= endDate)
+                .group_by(Tags.tag_label, Tags.tag_color)
+                .order_by(Tags.tag_label)
+                .all()
+            )
         
-        return tasks_with_tag
+        return task_sum_with_date, doing_todo_tasks, average_time_per_tag
     
     def update_task(self, task):
         with SessionManager() as session:
