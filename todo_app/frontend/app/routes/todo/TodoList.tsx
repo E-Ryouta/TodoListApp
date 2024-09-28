@@ -9,12 +9,11 @@ import {
   DragStartEvent,
   DragOverEvent,
 } from "@dnd-kit/core";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { UUID } from "crypto";
 import { arrayMove } from "@dnd-kit/sortable";
 import { TaskColumn } from "./TaskColumn";
-import { getTodoList, putTasks } from "app/endpoints";
-import { LineChart } from "@/components/LineChart";
+import { getTasks, putTasks } from "app/endpoints";
 
 /**
  * TODO:todoStateを管理するhooksを作りたい
@@ -122,7 +121,7 @@ export function TodoList({ date }: TodoListProps) {
 
   useEffect(() => {
     const fetchTasks = async () => {
-      const response = await getTodoList(date);
+      const response = await getTasks(date);
       const getStateTasks = {
         todo: response["todo"].map((task: any) => ({
           id: task.task_id,
