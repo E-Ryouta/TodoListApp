@@ -1,5 +1,6 @@
 from ..utils.utils import object_as_dict
 from ..models.data_access import DataAccess
+from collections import OrderedDict
 
 
 class TodoListService:
@@ -7,7 +8,23 @@ class TodoListService:
         self.data_access = DataAccess()
 
     def get_tasks(self, created_at):
-        return self.data_access.get_tasks(created_at)
+        tasks_model = self.data_access.get_tasks(created_at)
+                    
+        todo_list_obj = OrderedDict(
+            {
+                "todo": [],
+                "inProgress": [],
+                "done": [],
+            }
+        )
+        
+        tasks_dict = [object_as_dict(task) for task in tasks_model]
+
+        for task in tasks_dict:
+            if (task["task_container_id"] in todo_list_obj):
+                todo_list_obj[task["task_container_id"]].append(task)
+
+        return todo_list_obj
     
     def get_tags(self):
         return self.data_access.get_tags()
@@ -18,7 +35,7 @@ class TodoListService:
         task_sum_with_date_list = [
             {
                 "date": item.date.strftime("%Y-%m-%d"),
-                "total_tasks": item.total_tasks
+                "totalTasks": item.total_tasks
             }
             for item in task_sum_with_date
         ]
@@ -27,17 +44,17 @@ class TodoListService:
 
         average_time_per_tag_list = [
             {
-                "tag_label": item.tag_label,
-                "tag_color": item.tag_color,
-                "average_duration": float(item.average_duration) if item.average_duration is not None else 0.0
+                "tagLabel": item.tag_label,
+                "tagColor": item.tag_color,
+                "averageDuration": float(item.average_duration) if item.average_duration is not None else 0.0
             }
             for item in average_time_per_tag
         ]
 
         task_with_tag_obj = {
-            "task_sum_with_date": task_sum_with_date_list,
-            "doing_todo_tasks": doing_todo_tasks_list,
-            "average_time_per_tag": average_time_per_tag_list
+            "taskSumWithDate": task_sum_with_date_list,
+            "doingTodoTasks": doing_todo_tasks_list,
+            "averageTimePerTag": average_time_per_tag_list
         }
         
         return task_with_tag_obj

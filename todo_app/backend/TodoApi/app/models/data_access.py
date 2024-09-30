@@ -67,11 +67,11 @@ class DataAccess:
             else:
                 session.add(Tasks(
                     task_id=task["task_id"], 
-                    task_container_id=task["task_container_id"], 
                     task_title=task["task_title"], 
                     task_description=task["task_description"], 
                     task_timer=task["task_timer"],
                     tag_id=task["tag_id"],
+                    task_container_id=task["task_container_id"], 
                     created_at=task["created_at"]))
 
             session.commit()

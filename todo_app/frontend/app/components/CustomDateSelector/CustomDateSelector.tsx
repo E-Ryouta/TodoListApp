@@ -6,14 +6,14 @@ import { DateSelector } from "../DateSelector";
 
 type DateBarProps = {
   date: string;
-  setDate: (date: string) => void;
+  handleSetDate: (date: string) => void;
 };
 
-export function CustomDateSelector({ date, setDate }: DateBarProps) {
+export function CustomDateSelector({ date, handleSetDate }: DateBarProps) {
   const changeDate = (days: number) => {
     const newDate = new Date(date);
     newDate.setDate(newDate.getDate() + days);
-    setDate(newDate.toISOString().split("T")[0]);
+    handleSetDate(newDate.toISOString().split("T")[0]);
   };
 
   return (
@@ -28,7 +28,7 @@ export function CustomDateSelector({ date, setDate }: DateBarProps) {
         icon={<MdKeyboardArrowLeft />}
       />
       <React.Suspense fallback={<div>Loading...</div>}>
-        <DateSelector date={date} setDate={setDate} />
+        <DateSelector date={date} handleSetDate={handleSetDate} />
       </React.Suspense>
       <IconButton
         size={"lg"}

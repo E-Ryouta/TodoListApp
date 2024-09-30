@@ -8,7 +8,7 @@ const DatePicker = React.lazy(() => import("react-datepicker"));
 
 type DateBarProps = {
   date: string;
-  setDate: (date: string) => void;
+  handleSetDate: (date: string) => void;
 };
 
 type CustomInputProps = {
@@ -16,7 +16,7 @@ type CustomInputProps = {
   onClick?: () => void;
 };
 
-export function DateSelector({ date, setDate }: DateBarProps) {
+export function DateSelector({ date, handleSetDate }: DateBarProps) {
   const [isClient, setIsClient] = useState(false);
   const [showDatePicker, setShowDatePicker] = useBoolean(false);
 
@@ -41,7 +41,7 @@ export function DateSelector({ date, setDate }: DateBarProps) {
   );
 
   const handleDateChange = (date: any) => {
-    if (date) setDate(date.toISOString().split("T")[0]);
+    if (date) handleSetDate(date.toISOString().split("T")[0]);
     setShowDatePicker.off();
   };
 

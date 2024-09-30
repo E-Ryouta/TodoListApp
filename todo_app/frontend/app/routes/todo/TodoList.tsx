@@ -1,155 +1,28 @@
-import { Box, HStack, useBoolean } from "@chakra-ui/react";
+import { Box, HStack } from "@chakra-ui/react";
 import { TaskCard } from "@/components/TaskCard";
 import type { TaskCardProps } from "@/components/TaskCard";
-import {
-  DndContext,
-  DragOverlay,
-  DragEndEvent,
-  closestCenter,
-  DragStartEvent,
-  DragOverEvent,
-} from "@dnd-kit/core";
-import { useEffect, useState } from "react";
+import { DndContext, DragOverlay, closestCenter } from "@dnd-kit/core";
 import { UUID } from "crypto";
-import { arrayMove } from "@dnd-kit/sortable";
-import { TaskColumn } from "./TaskColumn";
-import { getTasks, putTasks } from "app/endpoints";
-
-/**
- * TODO:todoStateを管理するhooksを作りたい
- * TODO：Drag部分を別コンポーネントに切り出す？
- */
+import { TaskColumn } from "@/components/TaskColumn/TaskColumn";
+import { TodoListLoaderData } from "./_endpoints/getTasks";
+import { useTodoList } from "./TodoList.hook";
 
 type TodoListProps = {
   date: string;
+  tasks: TodoListLoaderData;
 };
 
-export function TodoList({ date }: TodoListProps) {
-  const [isChangeFlg, setIsChangeFlg] = useBoolean(false);
-  const [activeTask, setActiveTask] = useState<TaskCardProps>();
-  const [todoState, setTodoState] = useState<Record<string, TaskCardProps[]>>({
-    todo: [],
-    inProgress: [],
-    done: [],
-  });
-
-  const onChangeTodoState = (
-    containerId: string,
-    updatedTasks: TaskCardProps[]
-  ) => {
-    setTodoState((prev) => ({
-      ...prev,
-      [containerId]: updatedTasks,
-    }));
-  };
-
-  const handleDragStart = (event: DragStartEvent) => {
-    const { id, data } = event.active;
-    const containerId = data?.current?.sortable.containerId;
-    const targetTask = todoState[containerId].find((task) => task.id === id);
-    if (targetTask) {
-      setActiveTask({
-        id: targetTask.id,
-        taskTitle: targetTask.taskTitle,
-        taskDescription: targetTask.taskDescription,
-        timer: targetTask.timer,
-        tag_id: targetTask.tag_id,
-      });
-    }
-  };
-
-  const handleDragOver = (event: DragOverEvent) => {
-    const { active, over } = event;
-    if (!over) return;
-
-    const activeContainerId = active.data?.current?.sortable.containerId;
-    const overContainerId = todoState[over.id]
-      ? over.id
-      : over.data?.current?.sortable.containerId;
-    if (!overContainerId || activeContainerId === overContainerId) return;
-
-    const newTasks = todoState[activeContainerId].filter(
-      (task) => task.id !== active.id
-    );
-
-    const insertTask = todoState[activeContainerId].find(
-      (task) => task.id === active.id
-    );
-
-    if (insertTask) {
-      setTodoState((prev) => ({
-        ...prev,
-        [activeContainerId]: newTasks,
-        [overContainerId]: [...prev[overContainerId], insertTask],
-      }));
-
-      setIsChangeFlg.on();
-    }
-  };
-
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-
-    const activeContainerId = active.data?.current?.sortable.containerId;
-    const overContainerId = over?.data?.current?.sortable.containerId;
-
-    if (activeContainerId === overContainerId) {
-      const newTasks = arrayMove(
-        todoState[activeContainerId],
-        active?.data?.current?.sortable.index,
-        over?.data?.current?.sortable.index
-      );
-
-      setTodoState((prev) => ({
-        ...prev,
-        [activeContainerId]: newTasks,
-      }));
-    }
-
-    if (isChangeFlg) {
-      putTasks({
-        task_id: activeTask!.id,
-        tag_id: activeTask!.tag_id,
-        task_container_id: activeContainerId,
-        task_title: activeTask!.taskTitle,
-        task_description: activeTask!.taskDescription,
-        created_at: date,
-      });
-      setIsChangeFlg.off();
-    }
-  };
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      const response = await getTasks(date);
-      const getStateTasks = {
-        todo: response["todo"].map((task: any) => ({
-          id: task.task_id,
-          taskTitle: task.task_title,
-          taskDescription: task.task_description,
-          timer: task.task_timer,
-          tag_id: task.tag_id,
-        })),
-        inProgress: response["inProgress"].map((task: any) => ({
-          id: task.task_id,
-          taskTitle: task.task_title,
-          taskDescription: task.task_description,
-          timer: task.task_timer,
-          tag_id: task.tag_id,
-        })),
-        done: response["done"].map((task: any) => ({
-          id: task.task_id,
-          taskTitle: task.task_title,
-          taskDescription: task.task_description,
-          timer: task.task_timer,
-          tag_id: task.tag_id,
-        })),
-      };
-      setTodoState(getStateTasks);
-    };
-
-    fetchTasks();
-  }, [date]);
+export function TodoList({ date, tasks }: TodoListProps) {
+  const {
+    todoState,
+    activeTask,
+    onAddTodoStateNewTask,
+    onDeleteTodoStateNewTask,
+    onUpdateTodoStateNewTask,
+    handleDragStart,
+    handleDragEnd,
+    handleDragOver,
+  } = useTodoList({ date, tasks });
 
   return (
     <DndContext
@@ -166,14 +39,16 @@ export function TodoList({ date }: TodoListProps) {
               key={taskContainerId}
               date={date}
               containerId={taskContainerId}
-              onChangeTodoState={onChangeTodoState}
+              onAddTodoStateNewTask={onAddTodoStateNewTask}
+              onDeleteStateNewTask={onDeleteTodoStateNewTask}
+              onUpdateTodoStateNewTask={onUpdateTodoStateNewTask}
             />
           </Box>
         ))}
       </HStack>
       <DragOverlay>
         <TaskCard
-          id={activeTask ? activeTask.id : ("" as UUID)}
+          id={activeTask ? activeTask.taskId : ("" as UUID)}
           task={activeTask ? activeTask : ({} as TaskCardProps)}
           addTimerFlag={false}
           startClickApproveFlg={false}

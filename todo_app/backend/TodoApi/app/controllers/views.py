@@ -1,33 +1,19 @@
 from flask import Blueprint, jsonify
 from ..services.business_logic import TodoListService
-from ..utils.utils import object_as_dict, to_camel_case
+from ..utils.utils import object_as_dict, to_camel_case, to_snake_case
 from flask import request
-from collections import OrderedDict
 
 todo_list_service = TodoListService()
 bp = Blueprint("todo_list", __name__)
 
 @bp.route("/tasks", methods=["GET"])
 def get_tasks():
-    created_at = request.args.get("created_at")
-    tasks_model = todo_list_service.get_tasks(created_at)
-            
-    todo_list_obj = OrderedDict(
-        {
-            "todo": [],
-            "inProgress": [],
-            "done": [],
-        }
-    )
+    created_at = request.args.get("createdAt")
+    todo_list_obj = todo_list_service.get_tasks(created_at)
     
-    tasks_dict = [object_as_dict(task) for task in tasks_model]
+    res_todo_list_obj =  to_camel_case(todo_list_obj)
 
-    for task in tasks_dict:
-
-        if (task["task_container_id"] in todo_list_obj):
-            todo_list_obj[task["task_container_id"]].append(task)
-
-    return jsonify(todo_list_obj).json
+    return jsonify(res_todo_list_obj).json
 
 @bp.route("/tags", methods=["GET"])
 def get_tags():
@@ -49,7 +35,8 @@ def get_tasks_with_tag():
 
 @bp.route("/tasks", methods=["PUT"])
 def put_task():
-    task = request.json
+    task = to_snake_case(request.json)
+    print("task", task )
     if not task:
         return jsonify({"message": "Task not found"}), 400
 
@@ -58,7 +45,7 @@ def put_task():
 
 @bp.route("/tasks", methods=["DELETE"])
 def delete_task():
-    task = request.json
+    task = to_snake_case(request.json)
     if not task:
         return jsonify({"message": "Task not found"}), 400
 

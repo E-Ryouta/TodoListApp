@@ -28,11 +28,11 @@ import { SelectTagProps } from "../TaskKindTag/SelectTagPopOver";
 // Timerの処理をhooksに切り出す
 
 export type TaskCardProps = {
-  id: UUID;
+  taskId: UUID;
   taskTitle: string;
   taskDescription: string;
-  timer: number;
-  tag_id: UUID;
+  taskTimer: number;
+  tagId: UUID;
 };
 
 type TaskCardPropsWithSetters = {
@@ -41,7 +41,7 @@ type TaskCardPropsWithSetters = {
   addTimerFlag: boolean;
   startClickApproveFlg: boolean;
   handleDeleteTask: (taskId: string) => void;
-  handleUpdateTask: (taskId: string, task: TaskCardProps) => void;
+  handleUpdateTask: (task: TaskCardProps) => void;
   handleTodoUpdate: (updatedTask: TaskCardProps) => void;
 };
 
@@ -60,16 +60,17 @@ export function TaskCard({
   const [taskDescription, setTaskDescription] = useState(
     task.taskDescription || ""
   );
-  const [tag_id, setTag_id] = useState(task.tag_id);
+  const [tagId, setTag_id] = useState(task.tagId);
   const [tagList, setTagList] = useState<SelectTagProps[]>([]);
 
   // TODO：今のところタグの更新は実装しないため、親コンポーネントでタグの更新を行う
+  // バケツリレーにはなるが親から渡せされた方がよさそう
   useEffect(() => {
     const fetchTags = async () => {
       const tags = await getTags();
       setTagList(
         tags.map((tag: any) => ({
-          tag_id: tag.tag_id,
+          tagId: tag.tagId,
           tagLabel: tag.tag_label,
           color: tag.tag_color,
         }))
@@ -84,13 +85,13 @@ export function TaskCard({
 
   const handleTimerStartSettings = (time: number) => {
     if (isStart) {
-      handleUpdateTask(id, { ...task, timer: time });
+      handleUpdateTask({ ...task, taskTimer: time });
     }
     setIsStart.toggle();
   };
 
   const handleTimerResetSettings = () => {
-    handleUpdateTask(id, { ...task, timer: 0 });
+    handleUpdateTask({ ...task, taskTimer: 0 });
     setIsStart.off();
   };
 
@@ -101,15 +102,15 @@ export function TaskCard({
     }, 1000);
   };
 
-  const handleUpdateTag = (tag_id: UUID) => {
-    setTag_id(tag_id);
-    handleUpdateTask(id, { ...task, tag_id });
+  const handleUpdateTag = (tagId: UUID) => {
+    setTag_id(tagId);
+    handleUpdateTask({ ...task, tagId });
   };
 
   return (
     <>
       <TaskKindTag
-        tag_id={tag_id}
+        tag_id={tagId}
         tagList={tagList}
         handleUpdateTag={handleUpdateTag}
       />
@@ -120,7 +121,7 @@ export function TaskCard({
               <Timer
                 isStart={isStart}
                 animateTimerIcon={animateTimerIcon}
-                defaultTime={task.timer}
+                defaultTime={task.taskTimer}
                 startClickApproveFlg={startClickApproveFlg}
                 updateTimerSettings={handleTimerStartSettings}
                 resetTimerSettings={handleTimerResetSettings}
@@ -145,7 +146,7 @@ export function TaskCard({
                   value={taskTitle}
                   ref={inputTitleRef}
                   onBlur={(e) =>
-                    handleUpdateTask(id, { ...task, taskTitle: e.target.value })
+                    handleUpdateTask({ ...task, taskTitle: e.target.value })
                   }
                   onChange={(e) => setTaskTitle(e.target.value)}
                   onKeyDown={(e) => {
@@ -180,7 +181,7 @@ export function TaskCard({
                   placeholder={"Task Description"}
                   value={taskDescription}
                   onBlur={(e) =>
-                    handleUpdateTask(id, {
+                    handleUpdateTask({
                       ...task,
                       taskDescription: e.target.value,
                     })

@@ -15,7 +15,7 @@ export function TodoDateBar({ date, handleSetDate }: TodoDateBarProps) {
       bg={"tertiary"}
       zIndex={1}
     >
-      <CustomDateSelector date={date} setDate={handleSetDate} />
+      <CustomDateSelector date={date} handleSetDate={handleSetDate} />
     </Box>
   );
 }

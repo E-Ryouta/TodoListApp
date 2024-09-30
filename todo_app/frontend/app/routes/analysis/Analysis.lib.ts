@@ -1,7 +1,7 @@
 import type {
   DoingTodoTask,
   TaskSumWithDate,
-} from "./_endpoints/getAnalysisTasks";
+} from "./_endpoints/getTasksWithTag";
 
 /**
  * 現在日付が含まれる週の最初の日付を取得
@@ -12,7 +12,7 @@ export function getWeekStartDates() {
   const dayOfWeek = today.getDay();
 
   const monday = new Date(today);
-  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 2));
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
 
   return monday.toISOString().split("T")[0];
 }
@@ -26,7 +26,7 @@ export function getWeekEndDates() {
   const dayOfWeek = today.getDay();
 
   const monday = new Date(today);
-  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 2));
+  monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
 
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
@@ -56,7 +56,6 @@ export function generateLineChartData(
     taskDataMap.set(task.date, task.totalTasks);
   });
 
-  console.log(dateRange);
   const lineChartData = dateRange.map((date) => {
     return {
       日付: date,

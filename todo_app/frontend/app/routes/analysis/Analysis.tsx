@@ -2,7 +2,7 @@ import { LineChart } from "@/components/LineChart";
 import { Box, HStack, VStack } from "@chakra-ui/react";
 import { PieChart } from "@/components/PieChart";
 import { Table } from "@/components/Table";
-import type { getTasksWithTagResponse } from "./_endpoints/getAnalysisTasks";
+import type { getTasksWithTagResponse } from "./_endpoints/getTasksWithTag";
 import { generateLineChartData } from "./Analysis.lib";
 
 type AnalysisProps = {

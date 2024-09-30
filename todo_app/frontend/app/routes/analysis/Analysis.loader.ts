@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs, redirect } from "@remix-run/node";
 import { getWeekEndDates, getWeekStartDates } from "./Analysis.lib";
-import { getTasksWithTag } from "@/endpoints";
+import { getTasksWithTag } from "./_endpoints";
 
 export const analysisLoader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);

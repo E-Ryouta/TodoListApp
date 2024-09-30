@@ -22,11 +22,11 @@ export function AnalysisDateBar({
       bg={"tertiary"}
       zIndex={1}
     >
-      <DateSelector date={startDate} setDate={handleStartDate} />
+      <DateSelector date={startDate} handleSetDate={handleStartDate} />
       <Text fontSize={"2xl"} fontWeight={"bold"} color={"secondary"}>
         ~
       </Text>
-      <DateSelector date={endDate} setDate={handleEndDate} />
+      <DateSelector date={endDate} handleSetDate={handleEndDate} />
     </Box>
   );
 }
