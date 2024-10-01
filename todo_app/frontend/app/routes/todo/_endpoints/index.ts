@@ -1,4 +1,7 @@
 export { getTasks } from "./getTasks";
-export { putTasks } from "./putTasks";
-export { deleteTasks } from "./deleteTasks";
+export { putTask } from "./putTask";
+export { deleteTask } from "./deleteTask";
+export { putContainerOrder } from "./putContainerOrder";
 export type { TodoListLoaderData } from "./getTasks";
+export type { PutTasksRow } from "./putContainerOrder";
+export type { PutContainerOrder } from "./putTask";

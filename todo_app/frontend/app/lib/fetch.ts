@@ -22,7 +22,7 @@ export const fetchGet = async <T = any>(
 // PUTリクエストを送る関数
 export const fetchPut = async (
   endpoint: string,
-  body: { [key: string]: string }
+  body: { [key: string]: any }
 ) => {
   const url = getUrl(endpoint);
   const response = await fetch(url, {

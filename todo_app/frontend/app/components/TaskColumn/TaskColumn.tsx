@@ -12,11 +12,9 @@ type TaskColumnProps = {
   date: string;
   tasks: TaskCardProps[];
   containerId: string;
-  onAddTodoStateNewTask: (
-    task: TaskCardProps & { taskContainerId: string }
-  ) => void;
+  onAddTodoStateNewTask: (task: TaskCardProps, containerId: string) => void;
   onUpdateTodoStateNewTask: (task: TaskCardProps, containerId: string) => void;
-  onDeleteStateNewTask: (taskId: string, containerId: string) => void;
+  onDeleteStateNewTask: (taskId: string) => void;
 };
 
 export type ModalParams = {
@@ -47,29 +45,35 @@ export const TaskColumn = function TaskColumn({
       });
       setModalOpen(null);
       if (res.ok) {
-        await onAddTodoStateNewTask({
-          taskId: new_id,
-          tagId: "87d7ad0a-7cb4-d6a8-c3cc-5a9033539a72",
-          taskTitle: res.data.taskTitle,
-          taskDescription: "",
-          taskTimer: res.data.timer,
-          taskContainerId: containerId,
-        });
+        await onAddTodoStateNewTask(
+          {
+            id: new_id,
+            tagId: "87d7ad0a-7cb4-d6a8-c3cc-5a9033539a72",
+            taskTitle: res.data.taskTitle,
+            taskDescription: "",
+            taskTimer: res.data.timer,
+            taskSortOrder: tasks.length + 1,
+          },
+          containerId
+        );
       }
     } else {
-      await onAddTodoStateNewTask({
-        taskId: new_id,
-        tagId: "87d7ad0a-7cb4-d6a8-c3cc-5a9033539a72",
-        taskTitle: "",
-        taskDescription: "",
-        taskTimer: 0,
-        taskContainerId: containerId,
-      });
+      await onAddTodoStateNewTask(
+        {
+          id: new_id,
+          tagId: "87d7ad0a-7cb4-d6a8-c3cc-5a9033539a72",
+          taskTitle: "",
+          taskDescription: "",
+          taskTimer: 0,
+          taskSortOrder: tasks.length + 1,
+        },
+        containerId
+      );
     }
   };
 
   const handleDeleteTask = async (taskId: string) => {
-    await onDeleteStateNewTask(taskId, containerId);
+    await onDeleteStateNewTask(taskId);
   };
 
   const handleUpdateTask = async (task: TaskCardProps) => {
@@ -86,17 +90,13 @@ export const TaskColumn = function TaskColumn({
       >
         <Box px={4} key={containerId}>
           {tasks.map((task) => (
-            <DraggableContainer
-              id={task.taskId as UUID}
-              key={task.taskId as UUID}
-            >
+            <DraggableContainer id={task.id as UUID} key={task.id as UUID}>
               <Box sx={{ margin: "1em" }}>
                 <TaskCard
                   task={task}
-                  id={task.taskId as UUID}
+                  id={task.id as UUID}
                   addTimerFlag={containerId !== "todo"}
                   startClickApproveFlg={containerId !== "inProgress"}
-                  handleTodoUpdate={() => {}}
                   handleUpdateTask={handleUpdateTask}
                   handleDeleteTask={handleDeleteTask}
                 />

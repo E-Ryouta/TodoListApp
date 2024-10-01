@@ -1,9 +1,7 @@
-import { useBoolean } from "@chakra-ui/react";
 import type { TaskCardProps } from "@/components/TaskCard";
 import { DragEndEvent, DragStartEvent, DragOverEvent } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import { arrayMove } from "@dnd-kit/sortable";
-import { putTasks } from "./_endpoints";
 import { useFetcher } from "@remix-run/react";
 import type { TodoListLoaderData } from "./_endpoints";
 
@@ -15,19 +13,25 @@ export const useTodoList = ({
   tasks: TodoListLoaderData;
 }) => {
   const fetcher = useFetcher();
-  const [isChangeFlg, setIsChangeFlg] = useBoolean(false);
   const [activeTask, setActiveTask] = useState<TaskCardProps>();
-  const [todoState, setTodoState] = useState<Record<string, TaskCardProps[]>>({
-    todo: tasks["todo"] || [],
-    inProgress: tasks["inProgress"] || [],
-    done: tasks["done"] || [],
-  });
+  const [todoState, setTodoState] = useState<Record<string, TaskCardProps[]>>(
+    {}
+  );
 
   useEffect(() => {
+    const todoTask = tasks["todo"].sort(
+      (a, b) => a.taskSortOrder - b.taskSortOrder
+    );
+    const inProgressTask = tasks["inProgress"].sort(
+      (a, b) => a.taskSortOrder - b.taskSortOrder
+    );
+    const doneTask = tasks["done"].sort(
+      (a, b) => a.taskSortOrder - b.taskSortOrder
+    );
     setTodoState({
-      todo: tasks["todo"] || [],
-      inProgress: tasks["inProgress"] || [],
-      done: tasks["done"] || [],
+      todo: todoTask || [],
+      inProgress: inProgressTask || [],
+      done: doneTask || [],
     });
   }, [tasks]);
 
@@ -37,76 +41,61 @@ export const useTodoList = ({
   ) => {
     fetcher.submit(
       {
-        taskId: task.taskId,
+        taskId: task.id,
         tagId: task.tagId,
         taskContainerId: containerId,
         taskTitle: task.taskTitle,
         taskTimer: task.taskTimer,
         taskDescription: task.taskDescription,
+        taskSortOrder: task.taskSortOrder,
         createdAt: date,
+        putType: "task",
       },
       { method: "PUT", encType: "application/json" }
     );
-    setTodoState((prev) => ({
-      ...prev,
-      [containerId]: prev[containerId].map((t) =>
-        t.taskId === task.taskId ? task : t
-      ),
-    }));
   };
 
   const onAddTodoStateNewTask = async (
-    task: TaskCardProps & { taskContainerId: string }
+    task: TaskCardProps,
+    containerId: string
   ) => {
     fetcher.submit(
       {
-        taskId: task.taskId,
+        taskId: task.id,
         tagId: task.tagId,
         taskTitle: task.taskTitle || "",
         taskTimer: task.taskTimer || 0,
         taskDescription: "",
         createdAt: date,
-        taskContainerId: task.taskContainerId,
+        taskSortOrder: task.taskSortOrder,
+        taskContainerId: containerId,
+        putType: "task",
       },
       {
         method: "PUT",
         encType: "application/json",
       }
     );
-    setTodoState((prev) => ({
-      ...prev,
-      [task.taskContainerId]: [...prev[task.taskContainerId], task],
-    }));
   };
 
-  const onDeleteTodoStateNewTask = async (
-    taskId: string,
-    containerId: string
-  ) => {
+  const onDeleteTodoStateNewTask = async (taskId: string) => {
     fetcher.submit(
       { taskId: taskId },
       { method: "DELETE", encType: "application/json" }
     );
-    setTodoState((prev) => ({
-      ...prev,
-      [containerId]: prev[containerId].filter(
-        (task: TaskCardProps) => task.taskId !== taskId
-      ),
-    }));
   };
 
   const handleDragStart = (event: DragStartEvent) => {
     const { id, data } = event.active;
     const containerId = data?.current?.sortable.containerId;
-    const targetTask = todoState[containerId].find(
-      (task) => task.taskId === id
-    );
+    const targetTask = todoState[containerId].find((task) => task.id === id);
     if (targetTask) {
       setActiveTask({
-        taskId: targetTask.taskId,
+        id: targetTask.id,
         taskTitle: targetTask.taskTitle,
         taskDescription: targetTask.taskDescription,
         taskTimer: targetTask.taskTimer,
+        taskSortOrder: targetTask.taskSortOrder,
         tagId: targetTask.tagId,
       });
     }
@@ -123,21 +112,26 @@ export const useTodoList = ({
     if (!overContainerId || activeContainerId === overContainerId) return;
 
     const newTasks = todoState[activeContainerId].filter(
-      (task) => task.taskId !== active.id
+      (task) => task.id !== active.id
     );
 
     const insertTask = todoState[activeContainerId].find(
-      (task) => task.taskId === active.id
+      (task) => task.id === active.id
     );
 
     if (insertTask) {
       setTodoState((prev) => ({
         ...prev,
         [activeContainerId]: newTasks,
-        [overContainerId]: [...prev[overContainerId], insertTask],
+        [overContainerId]: [
+          ...prev[overContainerId],
+          {
+            ...insertTask,
+            taskContainerId: overContainerId,
+            taskSortOrder: prev[overContainerId].length + 1,
+          },
+        ],
       }));
-
-      setIsChangeFlg.on();
     }
   };
 
@@ -147,31 +141,24 @@ export const useTodoList = ({
     const activeContainerId = active.data?.current?.sortable.containerId;
     const overContainerId = over?.data?.current?.sortable.containerId;
 
+    let newTodo = todoState;
     if (activeContainerId === overContainerId) {
       const newTasks = arrayMove(
         todoState[activeContainerId],
         active?.data?.current?.sortable.index,
         over?.data?.current?.sortable.index
       );
-
-      setTodoState((prev) => ({
-        ...prev,
+      newTodo = {
+        ...todoState,
         [activeContainerId]: newTasks,
-      }));
+      };
+      setTodoState(newTodo);
     }
 
-    if (isChangeFlg) {
-      putTasks({
-        taskId: activeTask!.taskId,
-        tagId: activeTask!.tagId,
-        taskContainerId: activeContainerId,
-        taskTitle: activeTask!.taskTitle,
-        taskDescription: activeTask!.taskDescription,
-        createdAt: date,
-        taskTimer: activeTask!.taskTimer.toString(),
-      });
-      setIsChangeFlg.off();
-    }
+    fetcher.submit(
+      { ...newTodo, putType: "tasks" },
+      { method: "PUT", encType: "application/json" }
+    );
   };
 
   return {

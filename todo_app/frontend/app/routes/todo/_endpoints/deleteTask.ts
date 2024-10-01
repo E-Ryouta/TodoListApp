@@ -1,7 +1,7 @@
 import { fetchDelete } from "@/lib/fetch";
 
-const ENDPOINT = "/api/tasks";
+const ENDPOINT = "/api/task";
 
-export const deleteTasks = async (taskId: string) => {
+export const deleteTask = async (taskId: string) => {
   return await fetchDelete(ENDPOINT, { taskId: taskId });
 };

@@ -24,14 +24,16 @@ import type { UUID } from "crypto";
 import { TaskKindTag } from "../TaskKindTag/TaskKindTag";
 import { getTags } from "@/endpoints";
 import { SelectTagProps } from "../TaskKindTag/SelectTagPopOver";
+import { UniqueIdentifier } from "@dnd-kit/core";
 
 // Timerの処理をhooksに切り出す
 
 export type TaskCardProps = {
-  taskId: UUID;
+  id: UUID;
   taskTitle: string;
   taskDescription: string;
   taskTimer: number;
+  taskSortOrder: number;
   tagId: UUID;
 };
 
@@ -42,7 +44,6 @@ type TaskCardPropsWithSetters = {
   startClickApproveFlg: boolean;
   handleDeleteTask: (taskId: string) => void;
   handleUpdateTask: (task: TaskCardProps) => void;
-  handleTodoUpdate: (updatedTask: TaskCardProps) => void;
 };
 
 export function TaskCard({
@@ -56,11 +57,7 @@ export function TaskCard({
   const [isStart, setIsStart] = useBoolean();
   const [addDescriptionFlag, setAddDescriptionFlag] = useBoolean(false);
   const [animateTimerIcon, setAnimateTimerIcon] = useBoolean(false);
-  const [taskTitle, setTaskTitle] = useState(task.taskTitle || "");
-  const [taskDescription, setTaskDescription] = useState(
-    task.taskDescription || ""
-  );
-  const [tagId, setTag_id] = useState(task.tagId);
+  // ToDo：loaderを実装したら不要になる
   const [tagList, setTagList] = useState<SelectTagProps[]>([]);
 
   // TODO：今のところタグの更新は実装しないため、親コンポーネントでタグの更新を行う
@@ -103,14 +100,13 @@ export function TaskCard({
   };
 
   const handleUpdateTag = (tagId: UUID) => {
-    setTag_id(tagId);
     handleUpdateTask({ ...task, tagId });
   };
 
   return (
     <>
       <TaskKindTag
-        tag_id={tagId}
+        tag_id={task.tagId}
         tagList={tagList}
         handleUpdateTag={handleUpdateTag}
       />
@@ -139,16 +135,15 @@ export function TaskCard({
                 {...(!isStart && draggableContext?.attributes)}
                 {...(!isStart && draggableContext?.listeners)}
               />
-              <Tooltip label={taskTitle} placement={"top"}>
+              <Tooltip label={task.taskTitle || ""} placement={"top"}>
                 <Input
                   ml={4}
                   variant={"unstyled"}
-                  value={taskTitle}
+                  defaultValue={task.taskTitle || ""}
                   ref={inputTitleRef}
                   onBlur={(e) =>
                     handleUpdateTask({ ...task, taskTitle: e.target.value })
                   }
-                  onChange={(e) => setTaskTitle(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") {
                       inputTitleRef.current?.blur();
@@ -179,14 +174,13 @@ export function TaskCard({
                 <Textarea
                   variant={"unstyled"}
                   placeholder={"Task Description"}
-                  value={taskDescription}
+                  defaultValue={task.taskDescription || ""}
                   onBlur={(e) =>
                     handleUpdateTask({
                       ...task,
                       taskDescription: e.target.value,
                     })
                   }
-                  onChange={(e) => setTaskDescription(e.target.value)}
                 />
               </CardBody>
             </Box>

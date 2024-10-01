@@ -48,11 +48,10 @@ export function TodoList({ date, tasks }: TodoListProps) {
       </HStack>
       <DragOverlay>
         <TaskCard
-          id={activeTask ? activeTask.taskId : ("" as UUID)}
+          id={activeTask ? activeTask.id : ("" as UUID)}
           task={activeTask ? activeTask : ({} as TaskCardProps)}
           addTimerFlag={false}
           startClickApproveFlg={false}
-          handleTodoUpdate={() => {}}
           handleDeleteTask={() => {}}
           handleUpdateTask={() => {}}
         />
