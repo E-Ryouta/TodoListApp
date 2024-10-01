@@ -41,6 +41,7 @@ type TaskCardPropsWithSetters = {
   id: UUID;
   task: TaskCardProps;
   addTimerFlag: boolean;
+  tagList: SelectTagProps[];
   startClickApproveFlg: boolean;
   handleDeleteTask: (taskId: string) => void;
   handleUpdateTask: (task: TaskCardProps) => void;
@@ -49,6 +50,7 @@ type TaskCardPropsWithSetters = {
 export function TaskCard({
   id,
   task,
+  tagList,
   addTimerFlag,
   startClickApproveFlg,
   handleDeleteTask,
@@ -57,25 +59,6 @@ export function TaskCard({
   const [isStart, setIsStart] = useBoolean();
   const [addDescriptionFlag, setAddDescriptionFlag] = useBoolean(false);
   const [animateTimerIcon, setAnimateTimerIcon] = useBoolean(false);
-  // ToDo：loaderを実装したら不要になる
-  const [tagList, setTagList] = useState<SelectTagProps[]>([]);
-
-  // TODO：今のところタグの更新は実装しないため、親コンポーネントでタグの更新を行う
-  // バケツリレーにはなるが親から渡せされた方がよさそう
-  useEffect(() => {
-    const fetchTags = async () => {
-      const tags = await getTags();
-      setTagList(
-        tags.map((tag: any) => ({
-          tagId: tag.tagId,
-          tagLabel: tag.tag_label,
-          color: tag.tag_color,
-        }))
-      );
-    };
-
-    fetchTags();
-  }, []);
 
   const draggableContext = useContext(DraggableContext);
   const inputTitleRef = useRef<HTMLInputElement>(null);
@@ -106,7 +89,7 @@ export function TaskCard({
   return (
     <>
       <TaskKindTag
-        tag_id={task.tagId}
+        tagId={task.tagId}
         tagList={tagList}
         handleUpdateTag={handleUpdateTag}
       />

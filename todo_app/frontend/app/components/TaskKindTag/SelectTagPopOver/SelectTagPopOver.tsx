@@ -10,13 +10,12 @@ import {
   Button,
   useDisclosure,
 } from "@chakra-ui/react";
-import type { TagProps } from "@chakra-ui/react";
 import type { UUID } from "crypto";
 
 export type SelectTagProps = {
-  tag_id: UUID;
+  tagId: UUID;
   tagLabel: string;
-  color: TagProps["colorScheme"];
+  tagColor: string;
 };
 
 type SelectTagPopOverProps = {
@@ -50,9 +49,9 @@ export function SelectTagPopOver({
               p={0}
               mx={"0.2rem"}
               mb={"0.2rem"}
-              onClick={() => handleClick(tag.tag_id)}
+              onClick={() => handleClick(tag.tagId)}
             >
-              <Tag variant={"subtle"} colorScheme={tag.color} h={"100%"}>
+              <Tag variant={"subtle"} colorScheme={tag.tagColor} h={"100%"}>
                 <TagLabel>{tag.tagLabel}</TagLabel>
               </Tag>
             </Button>

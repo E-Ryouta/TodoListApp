@@ -5,13 +5,13 @@ import { SelectTagProps } from "./SelectTagPopOver";
 import { UUID } from "crypto";
 
 type TaskKindTagProps = {
-  tag_id: UUID;
+  tagId: UUID;
   tagList: SelectTagProps[];
   handleUpdateTag: (tag_id: UUID) => void;
 };
 
 export function TaskKindTag({
-  tag_id,
+  tagId,
   tagList,
   handleUpdateTag,
 }: TaskKindTagProps) {
@@ -27,12 +27,12 @@ export function TaskKindTag({
             size={"lg"}
             variant={"subtle"}
             colorScheme={
-              tagList.find((tag) => tag.tag_id === tag_id)?.color || "gray"
+              tagList.find((tag) => tag.tagId === tagId)?.tagColor || "gray"
             }
             borderBottomRadius={0}
           >
             <TagLabel w={"50px"}>
-              {tagList.find((tag) => tag.tag_id === tag_id)?.tagLabel || "None"}
+              {tagList.find((tag) => tag.tagId === tagId)?.tagLabel || "None"}
             </TagLabel>
             <TagRightIcon boxSize={"20px"}>
               <MdChangeCircle size={"lg"} />

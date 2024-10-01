@@ -22,8 +22,14 @@ server {
         proxy_pass http://todo_api:5001;
     }
 
+    location = / {
+        rewrite ^ /todo/ permanent;
+    }
+
+    # その他のパスはそのまま通す
     location / {
         proxy_pass http://frontend:80;
     }
+
 
 }

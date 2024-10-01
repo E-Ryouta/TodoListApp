@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from "@remix-run/node";
-import { getTasks } from "./_endpoints/getTasks";
+import { getTasks, getTags } from "./_endpoints";
 import { redirect } from "@remix-run/react";
 
 export const todoListLoader = async ({ request }: LoaderFunctionArgs) => {
@@ -10,5 +10,6 @@ export const todoListLoader = async ({ request }: LoaderFunctionArgs) => {
   }
 
   const tasks = await getTasks(date);
-  return tasks;
+  const tagList = await getTags();
+  return { tasks, tagList };
 };

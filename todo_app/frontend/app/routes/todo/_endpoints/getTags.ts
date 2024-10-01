@@ -1,4 +1,4 @@
-import { fetchGet } from "../lib/fetch";
+import { fetchGet } from "@/lib/fetch";
 
 const ENDPOINT = "/api/tags";
 

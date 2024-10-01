@@ -13,8 +13,10 @@ import {
   LiveReload,
   Meta,
   Outlet,
+  redirect,
   Scripts,
   ScrollRestoration,
+  useMatches,
 } from "@remix-run/react";
 import { MetaFunction, LinksFunction } from "@remix-run/node";
 import { ServerStyleContext, ClientStyleContext } from "./context";
@@ -84,6 +86,14 @@ const Document = withEmotionCache(
     );
   }
 );
+
+export const loader = async () => {
+  const matches = useMatches();
+
+  // if (matches.length === 0) {
+  //   return redirect("/todo");
+  // }
+};
 
 export default function App() {
   const [isOpen, setIsOpen] = useBoolean();

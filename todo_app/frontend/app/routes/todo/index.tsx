@@ -12,7 +12,7 @@ export const action = todoListAction;
 export default function App() {
   const navigation = useNavigate();
   const [searchParams] = useSearchParams();
-  const tasks = useLoaderData<typeof loader>();
+  const { tasks, tagList } = useLoaderData<typeof loader>();
   const [date, setDate] = useState(
     searchParams.get("date") || new Date().toISOString().split("T")[0]
   );
@@ -33,7 +33,7 @@ export default function App() {
         overflowX={"auto"}
         pl={"60px"}
       >
-        <TodoList date={date} tasks={tasks} />
+        <TodoList date={date} tasks={tasks} tagList={tagList} />
       </Box>
     </VStack>
   );

@@ -21,8 +21,9 @@ def get_tags():
     tags_model = todo_list_service.get_tags()
 
     tags_dict = [object_as_dict(tag) for tag in tags_model]
+    res_tags_dict = to_camel_case(tags_dict)
 
-    return jsonify(tags_dict).json
+    return jsonify(res_tags_dict).json
 
 
 @bp.route("/tasks-with-tag", methods=["GET"])

@@ -4,15 +4,17 @@ import type { TaskCardProps } from "@/components/TaskCard";
 import { DndContext, DragOverlay, closestCenter } from "@dnd-kit/core";
 import { UUID } from "crypto";
 import { TaskColumn } from "@/components/TaskColumn/TaskColumn";
-import { TodoListLoaderData } from "./_endpoints/getTasks";
+import type { TodoListLoaderData } from "./_endpoints/getTasks";
 import { useTodoList } from "./TodoList.hook";
+import type { SelectTagProps } from "@/components/TaskKindTag/SelectTagPopOver";
 
 type TodoListProps = {
   date: string;
   tasks: TodoListLoaderData;
+  tagList: SelectTagProps[];
 };
 
-export function TodoList({ date, tasks }: TodoListProps) {
+export function TodoList({ date, tasks, tagList }: TodoListProps) {
   const {
     todoState,
     activeTask,
@@ -38,6 +40,7 @@ export function TodoList({ date, tasks }: TodoListProps) {
               tasks={tasks}
               key={taskContainerId}
               date={date}
+              tagList={tagList}
               containerId={taskContainerId}
               onAddTodoStateNewTask={onAddTodoStateNewTask}
               onDeleteStateNewTask={onDeleteTodoStateNewTask}
@@ -51,6 +54,7 @@ export function TodoList({ date, tasks }: TodoListProps) {
           id={activeTask ? activeTask.id : ("" as UUID)}
           task={activeTask ? activeTask : ({} as TaskCardProps)}
           addTimerFlag={false}
+          tagList={tagList}
           startClickApproveFlg={false}
           handleDeleteTask={() => {}}
           handleUpdateTask={() => {}}

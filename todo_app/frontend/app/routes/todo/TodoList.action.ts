@@ -27,7 +27,10 @@ export const todoListAction = async ({ request }: ActionFunctionArgs) => {
         putRes = await putTask({
           taskId: data.taskId,
           tagId: data.tagId,
-          taskContainerId: data.taskContainerId,
+          taskContainerId:
+            data.taskContainerId === "inProgress"
+              ? "in_progress"
+              : data.taskContainerId,
           taskTitle: data.taskTitle,
           taskDescription: data.taskDescription,
           taskTimer: data.taskTimer,

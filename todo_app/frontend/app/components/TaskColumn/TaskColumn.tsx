@@ -1,4 +1,4 @@
-import { Box } from "@chakra-ui/react";
+import { Box, Tag } from "@chakra-ui/react";
 import { useState } from "react";
 import { DroppableContainer } from "@/components/DroppableContainer";
 import { TaskProgressCard } from "@/components/TaskProgressCard";
@@ -7,11 +7,13 @@ import { DraggableContainer } from "@/components/DraggableContainer";
 import type { TaskCardProps } from "@/components/TaskCard/TaskCard";
 import { UUID } from "crypto";
 import { v4 as uuid4v } from "uuid";
+import type { SelectTagProps } from "../TaskKindTag/SelectTagPopOver";
 
 type TaskColumnProps = {
   date: string;
   tasks: TaskCardProps[];
   containerId: string;
+  tagList: SelectTagProps[];
   onAddTodoStateNewTask: (task: TaskCardProps, containerId: string) => void;
   onUpdateTodoStateNewTask: (task: TaskCardProps, containerId: string) => void;
   onDeleteStateNewTask: (taskId: string) => void;
@@ -27,6 +29,7 @@ export type ModalParams = {
 export const TaskColumn = function TaskColumn({
   tasks,
   containerId,
+  tagList,
   onAddTodoStateNewTask,
   onUpdateTodoStateNewTask,
   onDeleteStateNewTask,
@@ -95,6 +98,7 @@ export const TaskColumn = function TaskColumn({
                 <TaskCard
                   task={task}
                   id={task.id as UUID}
+                  tagList={tagList}
                   addTimerFlag={containerId !== "todo"}
                   startClickApproveFlg={containerId !== "inProgress"}
                   handleUpdateTask={handleUpdateTask}
