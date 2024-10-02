@@ -59,6 +59,8 @@ export function TaskCard({
   const draggableContext = useContext(DraggableContext);
   const inputTitleRef = useRef<HTMLInputElement>(null);
 
+  console.log(draggableContext);
+
   const handleTimerStartSettings = (time: number) => {
     if (isStart) {
       handleUpdateTask({ ...task, taskTimer: time });
@@ -111,6 +113,7 @@ export function TaskCard({
                 aria-label={"drag"}
                 icon={<MdDragIndicator />}
                 onMouseDown={handleAnimateTimerIcon}
+                cursor={"grab"}
                 {...(!isStart && draggableContext?.attributes)}
                 {...(!isStart && draggableContext?.listeners)}
               />

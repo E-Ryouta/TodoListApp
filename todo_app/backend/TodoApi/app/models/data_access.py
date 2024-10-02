@@ -37,7 +37,7 @@ class DataAccess:
 
             doing_todo_tasks = (
                 session.query(Tasks)
-                .filter(Tasks.task_container_id.in_(["todo", "inProgress"]))
+                .filter(Tasks.task_container_id.in_(["todo", "in_progress"]))
                 .filter(cast(Tasks.created_at, Date) >= startDate)
                 .filter(cast(Tasks.created_at, Date) <= endDate)
                 .all()

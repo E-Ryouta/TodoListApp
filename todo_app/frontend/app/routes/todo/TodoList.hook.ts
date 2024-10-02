@@ -13,7 +13,9 @@ export const useTodoList = ({
   tasks: TodoListLoaderData;
 }) => {
   const fetcher = useFetcher();
-  const [activeTask, setActiveTask] = useState<TaskCardProps>();
+  const [activeTask, setActiveTask] = useState<
+    TaskCardProps & { containerId: string }
+  >();
   const [todoState, setTodoState] = useState<Record<string, TaskCardProps[]>>(
     {}
   );
@@ -97,6 +99,7 @@ export const useTodoList = ({
         taskTimer: targetTask.taskTimer,
         taskSortOrder: targetTask.taskSortOrder,
         tagId: targetTask.tagId,
+        containerId: containerId,
       });
     }
   };

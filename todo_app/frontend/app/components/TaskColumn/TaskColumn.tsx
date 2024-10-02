@@ -1,4 +1,4 @@
-import { Box, Tag } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useState } from "react";
 import { DroppableContainer } from "@/components/DroppableContainer";
 import { TaskProgressCard } from "@/components/TaskProgressCard";
@@ -38,6 +38,8 @@ export const TaskColumn = function TaskColumn({
 
   const handleAddTask = async () => {
     const new_id = uuid4v() as UUID;
+    const defaultTagId =
+      tagList.find((tag) => tag.tagLabel === "None")?.tagId || ("" as UUID);
 
     if (containerId === "done") {
       const res = await new Promise<{
@@ -51,7 +53,7 @@ export const TaskColumn = function TaskColumn({
         await onAddTodoStateNewTask(
           {
             id: new_id,
-            tagId: "87d7ad0a-7cb4-d6a8-c3cc-5a9033539a72",
+            tagId: defaultTagId,
             taskTitle: res.data.taskTitle,
             taskDescription: "",
             taskTimer: res.data.timer,
@@ -64,7 +66,7 @@ export const TaskColumn = function TaskColumn({
       await onAddTodoStateNewTask(
         {
           id: new_id,
-          tagId: "87d7ad0a-7cb4-d6a8-c3cc-5a9033539a72",
+          tagId: defaultTagId,
           taskTitle: "",
           taskDescription: "",
           taskTimer: 0,

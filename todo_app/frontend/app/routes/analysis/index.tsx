@@ -25,7 +25,6 @@ export default function App() {
         w={"100%"}
         display={"flex"}
         alignItems={"flex-start"}
-        overflowX={"auto"}
         pl={"60px"}
       >
         <Analysis

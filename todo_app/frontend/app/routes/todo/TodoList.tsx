@@ -1,12 +1,11 @@
 import { Box, HStack } from "@chakra-ui/react";
-import { TaskCard } from "@/components/TaskCard";
 import type { TaskCardProps } from "@/components/TaskCard";
 import { DndContext, DragOverlay, closestCenter } from "@dnd-kit/core";
-import { UUID } from "crypto";
 import { TaskColumn } from "@/components/TaskColumn/TaskColumn";
 import type { TodoListLoaderData } from "./_endpoints/getTasks";
 import { useTodoList } from "./TodoList.hook";
 import type { SelectTagProps } from "@/components/TaskKindTag/SelectTagPopOver";
+import { TaskCardOverlay } from "@/components/TaskCardOverlay";
 
 type TodoListProps = {
   date: string;
@@ -50,15 +49,14 @@ export function TodoList({ date, tasks, tagList }: TodoListProps) {
         ))}
       </HStack>
       <DragOverlay>
-        <TaskCard
-          id={activeTask ? activeTask.id : ("" as UUID)}
-          task={activeTask ? activeTask : ({} as TaskCardProps)}
-          addTimerFlag={false}
-          tagList={tagList}
-          startClickApproveFlg={false}
-          handleDeleteTask={() => {}}
-          handleUpdateTask={() => {}}
-        />
+        <Box cursor={"grabbing"}>
+          <TaskCardOverlay
+            task={activeTask ? activeTask : ({} as TaskCardProps)}
+            addTimerFlag={activeTask?.containerId !== "todo"}
+            tagList={tagList}
+            startClickApproveFlg={false}
+          />
+        </Box>
       </DragOverlay>
     </DndContext>
   );

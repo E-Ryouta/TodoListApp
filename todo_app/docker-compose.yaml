@@ -32,7 +32,7 @@ services:
     build:
       context: ./frontend
     volumes:
-      - ./frontend/src:/app/src
+      - ./frontend/app:/app/src
     ports:
       - 80:80
     networks:

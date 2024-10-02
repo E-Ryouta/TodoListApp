@@ -26,12 +26,12 @@ export function TaskKindTag({
           <Tag
             size={"lg"}
             variant={"subtle"}
-            colorScheme={
-              tagList.find((tag) => tag.tagId === tagId)?.tagColor || "gray"
+            bg={
+              tagList.find((tag) => tag.tagId === tagId)?.tagColor || "#EEEEEE"
             }
             borderBottomRadius={0}
           >
-            <TagLabel w={"50px"}>
+            <TagLabel>
               {tagList.find((tag) => tag.tagId === tagId)?.tagLabel || "None"}
             </TagLabel>
             <TagRightIcon boxSize={"20px"}>

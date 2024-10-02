@@ -11,6 +11,8 @@ server {
     proxy_set_header X-Forwarded-Proto  $scheme;
     proxy_set_header X-Forwarded-Port   $http_x_forwarded_port;
     proxy_set_header X-Forwarded-Host   $host:3000;
+    proxy_set_header Cookie $http_cookie;
+    proxy_pass_header Set-Cookie;
 
     proxy_read_timeout 120;
     proxy_connect_timeout 120;
@@ -20,10 +22,6 @@ server {
 
     location /api/ {
         proxy_pass http://todo_api:5001;
-    }
-
-    location = / {
-        rewrite ^ /todo/ permanent;
     }
 
     # その他のパスはそのまま通す

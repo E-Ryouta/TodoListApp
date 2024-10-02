@@ -51,7 +51,7 @@ export function SelectTagPopOver({
               mb={"0.2rem"}
               onClick={() => handleClick(tag.tagId)}
             >
-              <Tag variant={"subtle"} colorScheme={tag.tagColor} h={"100%"}>
+              <Tag variant={"subtle"} bg={tag.tagColor} h={"100%"}>
                 <TagLabel>{tag.tagLabel}</TagLabel>
               </Tag>
             </Button>

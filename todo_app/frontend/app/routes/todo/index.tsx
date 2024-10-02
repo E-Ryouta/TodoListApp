@@ -30,7 +30,7 @@ export default function App() {
         w={"100%"}
         display={"flex"}
         alignItems={"flex-start"}
-        overflowX={"auto"}
+        overflow={"auto"}
         pl={"60px"}
       >
         <TodoList date={date} tasks={tasks} tagList={tagList} />

@@ -6,6 +6,11 @@ import type { EntryContext } from "@remix-run/node";
 
 import { ServerStyleContext } from "./context";
 import createEmotionCache from "./createEmotionCache";
+import { createCookie } from "@remix-run/node";
+
+export const alertCookie = createCookie("is-alert-myTodo", {
+  maxAge: 60 * 60 * 24,
+});
 
 export default function handleRequest(
   request: Request,
