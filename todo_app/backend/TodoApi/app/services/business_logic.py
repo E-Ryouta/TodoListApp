@@ -26,7 +26,7 @@ class TodoListService:
                     {
                         "id": task["task_id"],
                         "task_title": task["task_title"],
-                        "tas_description": task["task_description"],
+                        "task_description": task["task_description"],
                         "task_timer": task["task_timer"],
                         "task_containerId": task["task_container_id"],
                         "task_sortOrder": task["task_sort_order"],

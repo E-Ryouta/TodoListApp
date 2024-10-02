@@ -17,16 +17,12 @@ import {
   MdDragIndicator,
   MdDeleteOutline,
 } from "react-icons/md";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useRef } from "react";
 import { DraggableContext } from "../DraggableContainer/DraggableContext";
 import { Timer } from "../TimerCard";
 import type { UUID } from "crypto";
 import { TaskKindTag } from "../TaskKindTag/TaskKindTag";
-import { getTags } from "@/endpoints";
 import { SelectTagProps } from "../TaskKindTag/SelectTagPopOver";
-import { UniqueIdentifier } from "@dnd-kit/core";
-
-// Timerの処理をhooksに切り出す
 
 export type TaskCardProps = {
   id: UUID;
