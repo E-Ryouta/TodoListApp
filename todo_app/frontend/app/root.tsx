@@ -13,12 +13,10 @@ import {
   LiveReload,
   Meta,
   Outlet,
-  redirect,
   Scripts,
   ScrollRestoration,
-  useMatches,
 } from "@remix-run/react";
-import { MetaFunction, LinksFunction } from "@remix-run/node";
+import type { MetaFunction, LinksFunction } from "@remix-run/node";
 import { ServerStyleContext, ClientStyleContext } from "./context";
 import { IoIosArrowDropleft, IoIosArrowDropright } from "react-icons/io";
 import { NavBar } from "@/components/NavBar";
@@ -86,14 +84,6 @@ const Document = withEmotionCache(
     );
   }
 );
-
-export const loader = async () => {
-  const matches = useMatches();
-
-  // if (matches.length === 0) {
-  //   return redirect("/todo");
-  // }
-};
 
 export default function App() {
   const [isOpen, setIsOpen] = useBoolean();
