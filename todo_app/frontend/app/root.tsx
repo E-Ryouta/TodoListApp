@@ -44,13 +44,14 @@ import { alertCookie } from "./entry.server";
 export const meta: MetaFunction = () => {
   return [
     { charSet: "utf-8" },
-    { title: "New Remix App" },
+    { title: "My Daily Todo" },
     { name: "viewport", content: "width=device-width, initial-scale=1" },
   ];
 };
 
 export const links: LinksFunction = () => {
   return [
+    { rel: "icon", href: "/favicon.ico" },
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
     { rel: "preconnect", href: "https://fonts.gstatic.com" },
     {
