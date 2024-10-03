@@ -1,17 +1,17 @@
 import { CustomDateSelector } from "./CustomDateSelector";
 import { Meta, StoryObj } from "@storybook/react";
 
-const uiDateSelectMeta: Meta<typeof CustomDateSelector> = {
+const uiCustomDateSelectMeta: Meta<typeof CustomDateSelector> = {
   title: "CustomDateSelector",
   component: CustomDateSelector,
 };
-export default uiDateSelectMeta;
+export default uiCustomDateSelectMeta;
 
-type DateSelectStoryProps = StoryObj<typeof CustomDateSelector>;
+type CustomDateSelectStoryProps = StoryObj<typeof CustomDateSelector>;
 
-export const DateSelectStory: DateSelectStoryProps = {
+export const CustomDateSelectStory: CustomDateSelectStoryProps = {
   args: {
     date: "2022-01-01",
-    setDate: () => {},
+    handleSetDate: () => {},
   },
 };

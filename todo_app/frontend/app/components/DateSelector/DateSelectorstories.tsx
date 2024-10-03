@@ -12,6 +12,6 @@ type DateSelectStoryProps = StoryObj<typeof DateSelector>;
 export const DateSelectStory: DateSelectStoryProps = {
   args: {
     date: "2022-01-01",
-    setDate: () => {},
+    handleSetDate: () => {},
   },
 };

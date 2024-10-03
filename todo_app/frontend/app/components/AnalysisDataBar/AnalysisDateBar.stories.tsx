@@ -1,12 +1,19 @@
 import { AnalysisDateBar } from "./AnalysisDateBar";
 import { Meta, StoryObj } from "@storybook/react";
 
-const uiTableMeta: Meta<typeof AnalysisDateBar> = {
+const uiAnalysisDateBarMeta: Meta<typeof AnalysisDateBar> = {
   title: "AnalysisDateBar",
   component: AnalysisDateBar,
 };
-export default uiTableMeta;
+export default uiAnalysisDateBarMeta;
 
-type TableStoryProps = StoryObj<typeof AnalysisDateBar>;
+type AnalysisDateBarStoryProps = StoryObj<typeof AnalysisDateBar>;
 
-export const TableStory: TableStoryProps = {};
+export const AnalysisDateBarStory: AnalysisDateBarStoryProps = {
+  args: {
+    startDate: "2022-01-01",
+    endDate: "2022-01-31",
+    handleStartDate: () => {},
+    handleEndDate: () => {},
+  },
+};

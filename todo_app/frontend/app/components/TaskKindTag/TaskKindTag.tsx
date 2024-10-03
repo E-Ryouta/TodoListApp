@@ -35,7 +35,7 @@ export function TaskKindTag({
               {tagList.find((tag) => tag.tagId === tagId)?.tagLabel || "None"}
             </TagLabel>
             <TagRightIcon boxSize={"20px"}>
-              <MdChangeCircle size={"lg"} />
+              <MdChangeCircle size={"100%"} />
             </TagRightIcon>
           </Tag>
         </Button>
