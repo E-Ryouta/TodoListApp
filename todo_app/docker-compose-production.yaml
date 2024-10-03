@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15.2
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./database/Sql:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: todo_database
+    ports:
+      - 5432:5432
+    networks:
+      todo_app_network:
+        ipv4_address: 172.18.0.2
+
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - ./frontend/app:/app/src
+    ports:
+      - 80:80
+    networks:
+      todo_app_network:
+        ipv4_address: 172.18.0.10
+    environment:
+      - BACKEND_ORIGIN_CLIENT=${BACKEND_ORIGIN_CLIENT}
+    extra_hosts:
+      - "nginx:172.18.0.5"
+
+  todo_api:
+    build:
+      context: ./backend/TodoApi
+    volumes:
+      - ./backend/TodoApi:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db:5432/todo_database
+    ports:
+      - 5001:5001
+    networks:
+      todo_app_network:
+        ipv4_address: 172.18.0.6
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  db:
+
+networks:
+  todo_app_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.18.0.0/16
