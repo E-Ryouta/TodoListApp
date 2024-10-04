@@ -104,7 +104,13 @@ const Document = withEmotionCache(
   }
 );
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
+export const loader = async ({ request }:LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+
+  if (url.pathname === "/") {
+    return redirect("/todo");
+  }
+
   const alertCookieGet = request.headers.get("Cookie");
   const isAlertCookie = alertCookie
     ? await alertCookie.parse(alertCookieGet)
@@ -112,17 +118,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   return isAlertCookie;
 };
 
-export const action = async ({ request }: ActionFunctionArgs) => {
-  const alertCookieGet = request.headers.get("Cookie");
-  const AlertCookie = alertCookie
-    ? await alertCookie.parse(alertCookieGet)
-    : {};
-
-  const isAlertCookie = AlertCookie ? true : false;
-  if (isAlertCookie) {
-    return redirect("/todo");
-  }
-
+export const action = async () => {
   const cookieHeader = await alertCookie.serialize("is-alert-myTodo");
   return redirect("/todo", {
     headers: {
