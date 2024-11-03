@@ -1,7 +1,7 @@
 import { HStack, VStack, Text, IconButton, Box } from "@chakra-ui/react";
 import { MdOutlineNotStarted, MdOutlineStopCircle } from "react-icons/md";
 import { IoReloadCircle } from "react-icons/io5";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./timerAnimation.css";
 
 type TimerProps = {
@@ -22,15 +22,28 @@ export function Timer({
   resetTimerSettings,
 }: TimerProps) {
   const [time, setTime] = useState(defaultTime);
+  const startTimeRef = useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout;
     if (isStart) {
-      timer = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
-      }, 1000);
+      if (startTimeRef.current === null) {
+        startTimeRef.current = Date.now() - time * 1000;
+      }
+
+      const updateTimer = () => {
+        const currentTime = Date.now();
+        const elapsedTime = Math.floor((currentTime - startTimeRef.current!) / 1000);
+        setTime(elapsedTime);
+        timerRef.current = window.requestAnimationFrame(updateTimer);
+      } 
+      timerRef.current = window.requestAnimationFrame(() => updateTimer());
+
+    } else if (timerRef.current !== null) {
+      cancelAnimationFrame(timerRef.current);
+      timerRef.current = null;
+      startTimeRef.current = null;
     }
-    return () => clearInterval(timer);
   }, [isStart]);
 
   const formatTime = (time: number) => {
