@@ -10,7 +10,7 @@ export const loader = analysisLoader;
 export const action = analysisAction;
 
 export default function App() {
-  const { startDate, endDate, handleChangeStartDate, handleChangeEndDate, handleDeleteTask } =
+  const { startDate, endDate, handleChangeStartDate, handleChangeEndDate, handleNavigationTodo, handleDeleteTask } =
     useAnalysis();
   const tasksWithTag = useLoaderData<typeof loader>();
 
@@ -33,6 +33,7 @@ export default function App() {
           tasksWithTag={tasksWithTag}
           startDate={startDate}
           endDate={endDate}
+          handleNavigationTodo={handleNavigationTodo}
           handleDeleteTask={handleDeleteTask}
         />
       </Box>
