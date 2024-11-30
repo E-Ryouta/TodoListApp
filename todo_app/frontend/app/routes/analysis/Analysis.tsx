@@ -9,10 +9,11 @@ type AnalysisProps = {
   startDate: string;
   endDate: string;
   tasksWithTag: getTasksWithTagResponse;
+  handleNavigationTodo: (date:string) => void;
   handleDeleteTask: (taskId:string) => void;
 };
 
-export function Analysis({ tasksWithTag, startDate, endDate, handleDeleteTask }: AnalysisProps) {
+export function Analysis({ tasksWithTag, startDate, endDate, handleNavigationTodo, handleDeleteTask }: AnalysisProps) {
   const lineChartData = generateLineChartData(
     tasksWithTag.taskSumWithDate,
     startDate,
@@ -42,6 +43,7 @@ export function Analysis({ tasksWithTag, startDate, endDate, handleDeleteTask }:
           <LineChart
             lineChartTitle={"完了タスク数の推移"}
             data={lineChartData}
+            handleNavigationTodo={handleNavigationTodo}
           />
         </Box>
         <Box w={"90%"} maxH={{ base: "160px", "2xl": "300px" }}>

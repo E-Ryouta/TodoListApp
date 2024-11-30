@@ -18,9 +18,10 @@ type LineChartData = {
 type LineChartProps = {
   lineChartTitle: string;
   data: LineChartData[];
+  handleNavigationTodo:(date:string) => void;
 };
 
-export function LineChart({ lineChartTitle, data }: LineChartProps) {
+export function LineChart({ lineChartTitle, data, handleNavigationTodo }: LineChartProps) {
   const theme = useTheme();
 
   return (
@@ -54,7 +55,13 @@ export function LineChart({ lineChartTitle, data }: LineChartProps) {
             dataKey={"タスク数"}
             stroke={theme.colors.secondary}
             strokeWidth={3}
-            activeDot={{ r: 10 }}
+            activeDot={{ 
+              onClick: (e, payload:any) => {
+                handleNavigationTodo(payload.payload["日付"])
+              },
+              cursor: 'pointer',
+              r: 10 
+            }}
             dot={{ r: 5 }}
           />
         </RechartsLineChar>

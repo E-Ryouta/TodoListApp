@@ -19,6 +19,10 @@ export const useAnalysis = () => {
     navigation(`/analysis?startDate=${startDate}&endDate=${date}`);
   };
 
+  const handleNavigationTodo = (date: string) => {
+    navigation(`/todo?date=${date}`)
+  }
+
   const handleDeleteTask= async (taskId: string) => {
     fetcher.submit(
       { taskId: taskId },
@@ -31,6 +35,7 @@ export const useAnalysis = () => {
     endDate,
     handleChangeStartDate,
     handleChangeEndDate,
+    handleNavigationTodo,
     handleDeleteTask
   };
 };
