@@ -9,9 +9,10 @@ type AnalysisProps = {
   startDate: string;
   endDate: string;
   tasksWithTag: getTasksWithTagResponse;
+  handleDeleteTask: (taskId:string) => void;
 };
 
-export function Analysis({ tasksWithTag, startDate, endDate }: AnalysisProps) {
+export function Analysis({ tasksWithTag, startDate, endDate, handleDeleteTask }: AnalysisProps) {
   const lineChartData = generateLineChartData(
     tasksWithTag.taskSumWithDate,
     startDate,
@@ -20,6 +21,7 @@ export function Analysis({ tasksWithTag, startDate, endDate }: AnalysisProps) {
 
   const tableData = tasksWithTag.doingTodoTasks.map((task) => {
     return {
+      id:task.taskId,
       taskTitle: task.taskTitle,
       date: task.createdAt,
     };
@@ -43,7 +45,7 @@ export function Analysis({ tasksWithTag, startDate, endDate }: AnalysisProps) {
           />
         </Box>
         <Box w={"90%"} maxH={{ base: "160px", "2xl": "300px" }}>
-          <Table tableTitle={"未完了タスク一覧"} data={tableData} />
+          <Table tableTitle={"未完了タスク一覧"} data={tableData} handleDeleteTask={handleDeleteTask}/>
         </Box>
       </VStack>
       <PieChart pieChartTitle={"タスク種類別平均時間"} data={pieChartData} />

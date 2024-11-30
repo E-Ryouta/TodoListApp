@@ -18,8 +18,10 @@ import {
   FaSortAmountDown,
   FaSortAmountUp,
 } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
 
 type TableDataProps = {
+  id: string;
   taskTitle: string;
   date: string;
 };
@@ -27,9 +29,10 @@ type TableDataProps = {
 export type TableProps = {
   tableTitle: string;
   data: TableDataProps[];
+  handleDeleteTask: (taskId:string) => void;
 };
 
-export function Table({ tableTitle, data }: TableProps) {
+export function Table({ tableTitle, data, handleDeleteTask }: TableProps) {
   const [isSortAsc, setIsSortAsc] = useBoolean(false);
 
   const handleSort = () => {
@@ -62,7 +65,10 @@ export function Table({ tableTitle, data }: TableProps) {
                     <FaCalendarDay />
                     <Text>日付</Text>
                   </HStack>
-                  <IconButton
+                </HStack>
+              </Th>
+              <Th py={2} textAlign={"center"}>
+                <IconButton
                     aria-label={"Sort"}
                     size={"sm"}
                     variant={"outline"}
@@ -74,7 +80,6 @@ export function Table({ tableTitle, data }: TableProps) {
                   >
                     {isSortAsc ? <FaSortAmountDown /> : <FaSortAmountUp />}
                   </IconButton>
-                </HStack>
               </Th>
             </Tr>
           </Thead>
@@ -84,6 +89,14 @@ export function Table({ tableTitle, data }: TableProps) {
                 <Tr key={item.taskTitle}>
                   <Td>{item.taskTitle}</Td>
                   <Td>{item.date}</Td>
+                  <Td textAlign={"center"}>
+                    <IconButton
+                      variant={"ghost"}
+                      aria-label={"delete"}
+                      icon={<MdDeleteOutline />}
+                      onClick={() => handleDeleteTask(item.id)}
+                    />
+                  </Td>
                 </Tr>
               );
             })}
@@ -93,3 +106,4 @@ export function Table({ tableTitle, data }: TableProps) {
     </VStack>
   );
 }
+

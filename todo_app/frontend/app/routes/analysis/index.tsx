@@ -4,11 +4,13 @@ import { AnalysisDateBar } from "@/components/AnalysisDataBar";
 import { useLoaderData } from "@remix-run/react";
 import { analysisLoader } from "./Analysis.loader";
 import { useAnalysis } from "./Analysis.hook";
+import { analysisAction } from "./Analysis.action";
 
 export const loader = analysisLoader;
+export const action = analysisAction;
 
 export default function App() {
-  const { startDate, endDate, handleChangeStartDate, handleChangeEndDate } =
+  const { startDate, endDate, handleChangeStartDate, handleChangeEndDate, handleDeleteTask } =
     useAnalysis();
   const tasksWithTag = useLoaderData<typeof loader>();
 
@@ -31,6 +33,7 @@ export default function App() {
           tasksWithTag={tasksWithTag}
           startDate={startDate}
           endDate={endDate}
+          handleDeleteTask={handleDeleteTask}
         />
       </Box>
     </VStack>
